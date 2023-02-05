@@ -1,7 +1,5 @@
 package com.babydev.app.domain.entity;
 
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -13,7 +11,6 @@ import java.util.List;
 @Table(name = "job")
 @Getter
 @Setter
-@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
 public class Job {
 
     @Id
@@ -36,12 +33,18 @@ public class Job {
     @Column(name = "experience_required")
     private String experienceRequired;
 
-//    @OneToMany(cascade = CascadeType.ALL, mappedBy = "job", fetch = FetchType.LAZY)
-//    private List<User> applicants;
+    @ManyToMany
+    @JoinTable(name = "applicants", joinColumns = @JoinColumn(name = "job_id"), inverseJoinColumns = @JoinColumn(name = "user_id"))
+    private List<User> applicants;
 
-   @OneToMany(cascade = CascadeType.ALL, mappedBy = "job", fetch = FetchType.LAZY)
+    @ManyToOne
+    @JoinColumn(referencedColumnName = "id", name = "author_id")
+    private User author;
+
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "job")
     private List<Skill> requiredSkill;
 
-   @OneToMany(cascade = CascadeType.ALL, mappedBy = "job", fetch = FetchType.LAZY)
-    private Company companyId;
+    @ManyToOne
+    @JoinColumn(referencedColumnName = "id", name = "company_id")
+    private Company company;
 }

@@ -6,6 +6,8 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.List;
+
 @Entity
 @Table(name = "company")
 @Getter
@@ -28,9 +30,8 @@ public class Company {
     @Column(name = "image")
     private byte[] image;
 
-    @ManyToOne
-    @JoinColumn(referencedColumnName = "id", name = "job_id")
-    private Job job;
+    @OneToMany(mappedBy = "company", cascade = CascadeType.ALL)
+    private List<Job> job;
 
 
 
