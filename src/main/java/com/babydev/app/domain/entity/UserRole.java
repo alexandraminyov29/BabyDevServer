@@ -1,4 +1,4 @@
-package com.babydev.domain.entity;
+package com.babydev.app.domain.entity;
 
 public enum UserRole {
     STANDARD,
