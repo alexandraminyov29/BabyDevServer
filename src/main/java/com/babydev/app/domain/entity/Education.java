@@ -35,5 +35,9 @@ public class Education {
     @Column(name = "degree")
     @Enumerated(EnumType.STRING)
     private Degree degree;
+    
+    @ManyToOne
+    @JoinColumn(referencedColumnName = "id", name = "user_id")
+    private User user;
 
 }

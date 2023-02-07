@@ -28,5 +28,9 @@ public class Skill {
     @ManyToOne
     @JoinColumn(referencedColumnName = "id", name = "job_id")
     private Job job;
+    
+    @ManyToOne
+    @JoinColumn(referencedColumnName = "id", name = "user_id")
+    private User user;
 
 }

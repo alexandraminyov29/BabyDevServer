@@ -22,6 +22,10 @@ public class Notification {
     @Column(name = "description")
     private String description;
 
-    @Column(name = "is_seen")
-    private Boolean isSeen;
+    @Column(name = "seen")
+    private Boolean seen;
+    
+    @ManyToOne
+    @JoinColumn(referencedColumnName = "id", name = "user_id")
+    private User user;
 }

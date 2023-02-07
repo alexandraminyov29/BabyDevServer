@@ -31,4 +31,8 @@ public class Experience {
 
     @Column(name = "dateTo")
     private LocalDateTime dateTo;
+    
+    @ManyToOne
+    @JoinColumn(referencedColumnName = "id", name = "user_id")
+    private User user;
 }

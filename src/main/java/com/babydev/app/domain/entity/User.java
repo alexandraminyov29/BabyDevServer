@@ -1,14 +1,32 @@
 package com.babydev.app.domain.entity;
 
-import jakarta.persistence.*;
-import lombok.*;
+import java.util.Collection;
+import java.util.List;
+
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import java.util.Collection;
-import java.util.List;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+@SuppressWarnings("serial")
 @Entity
 @Table(name = "users")
 @Getter
@@ -20,7 +38,7 @@ public class User implements UserDetails{
     @Id
     @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long userId;
 
     @Column(name = "first_name")
     private String firstName;
@@ -37,15 +55,36 @@ public class User implements UserDetails{
     @Column(name = "phone_number")
     private String phoneNumber;
     
+    @Column(name = "is_active")
+    private boolean isActive;
+    
     @Column(name = "user_role")
     @Enumerated(EnumType.STRING)
     private UserRole role;
-
+    
+    @JsonIgnore
 	@ManyToMany
 	private List<Job> appliedJobs;
 
+    @JsonIgnore
 	@OneToMany(mappedBy = "author", cascade = CascadeType.ALL)
 	private List<Job> postedJobs;
+	
+    @JsonIgnore
+	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+	private List<Skill> skills;
+	
+    @JsonIgnore
+	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+	private List<Notification> notifications;
+	
+    @JsonIgnore
+	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+	private List<Experience> experience;
+	
+    @JsonIgnore
+	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+	private List<Education> education;
 
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
