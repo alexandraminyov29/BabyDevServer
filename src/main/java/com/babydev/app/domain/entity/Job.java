@@ -1,5 +1,6 @@
 package com.babydev.app.domain.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -33,17 +34,21 @@ public class Job {
     @Column(name = "experience_required")
     private String experienceRequired;
 
+    @JsonIgnore
     @ManyToMany
     @JoinTable(name = "applicants", joinColumns = @JoinColumn(name = "job_id"), inverseJoinColumns = @JoinColumn(name = "user_id"))
     private List<User> applicants;
 
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(referencedColumnName = "id", name = "author_id")
     private User author;
 
+    @JsonIgnore
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "job")
     private List<Skill> requiredSkill;
 
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(referencedColumnName = "id", name = "company_id")
     private Company company;
