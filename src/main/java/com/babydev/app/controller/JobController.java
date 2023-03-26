@@ -9,6 +9,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/jobs")
 @RequiredArgsConstructor
@@ -32,4 +34,10 @@ public class JobController {
     public ResponseEntity<JobPageDTO> getJobById(@RequestParam Long jobId, @RequestParam Long userId) {
         return ResponseEntity.status(HttpStatus.OK).body(jobService.findJobById(jobId, userId));
     }
+
+    @GetMapping("/all")
+    public ResponseEntity<List<Job>> getJobs() {
+        return ResponseEntity.status(HttpStatus.OK).body(jobService.getJobs());
+    }
+
 }
