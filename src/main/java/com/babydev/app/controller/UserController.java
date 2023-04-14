@@ -5,12 +5,11 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.babydev.app.domain.entity.User;
 import com.babydev.app.exception.NotAuthorizedException;
 import com.babydev.app.service.impl.UserService;
 
@@ -22,10 +21,10 @@ public class UserController {
 	UserService userService;
 	
 	@DeleteMapping
-	public ResponseEntity<Void> deleteUserById(@RequestBody User user, 
+	public ResponseEntity<Void> deleteUserById(@RequestHeader("Authorization") String authorizationHeader, 
 			@RequestParam long id) {
 		try {
-			userService.deleteUserById(user, id);
+			userService.deleteUserById(authorizationHeader, id);
 			return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 		} catch (EmptyResultDataAccessException e) {
 			return new ResponseEntity<>(HttpStatus.UNPROCESSABLE_ENTITY);
