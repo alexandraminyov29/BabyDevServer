@@ -17,6 +17,7 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
@@ -61,6 +62,10 @@ public class User implements UserDetails{
     @Column(name = "user_role")
     @Enumerated(EnumType.STRING)
     private UserRole role;
+    
+    @Lob
+    @Column(name = "imagedata", length = 1000)
+    private byte[] imageData;
     
     @JsonIgnore
 	@ManyToMany

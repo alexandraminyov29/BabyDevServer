@@ -9,6 +9,8 @@ import java.util.function.Function;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
+import com.babydev.app.domain.entity.User;
+
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -74,6 +76,16 @@ public class JwtService {
 		final byte[] keyBytes = Decoders.BASE64.decode(SECRET_KEY);
 		
 		return Keys.hmacShaKeyFor(keyBytes);
+	}
+	
+	/**
+	 *  Method that extracts the user from the token
+	 *  
+	 *  @param header the header that contains the email
+	 */
+	public String extractUsernameFromToken(String header) {
+		final String token = header.substring("Bearer ".length());
+		return extractUsername(token);
 	}
 
 }

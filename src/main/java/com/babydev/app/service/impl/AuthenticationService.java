@@ -4,7 +4,9 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.apache.http.HttpResponse;
@@ -69,20 +71,27 @@ public class AuthenticationService {
 		if (request.getEmail().length() == 0 || request.getPassword().length() == 0) {
 			throw new EmptyFieldException();
 		}
-		
+
 		try {
-		authenticationManager
-				.authenticate(new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
-		} catch (BadCredentialsException e){
-		Optional<User> userRec = repository.findByEmail(request.getEmail());
-		if (userRec.isEmpty()) {
-			throw new EmailNotFoundException();
-		} else {
-			throw new WrongPasswordException();
+			authenticationManager
+					.authenticate(new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
+		} catch (BadCredentialsException e) {
+			Optional<User> userRec = repository.findByEmail(request.getEmail());
+			if (userRec.isEmpty()) {
+				throw new EmailNotFoundException();
+			} else {
+				throw new WrongPasswordException();
+			}
 		}
-		}
-		User user = repository.findByEmail(request.getEmail()).orElseThrow();
-		String jwtToken = jwtService.generateToken(user);
+		User user = repository.findByEmail(request.getEmail()).get();
+		
+		Map<String, Object> additionalClaims = new HashMap<>();
+		additionalClaims.put("firstName", user.getFirstName());
+		additionalClaims.put("lastName", user.getLastName());
+		additionalClaims.put("role", user.getRole());
+		// TODO: add image
+		
+		String jwtToken = jwtService.generateToken(additionalClaims, user);
 		return AuthenticationResponse.builder().token(jwtToken).build();
 	}
 

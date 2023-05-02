@@ -21,7 +21,7 @@ public class Cstl {
             'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M',
             'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
             '!', '#', '$', '%', '&', '\'', '*', '+', '-', '/', '=', '?', '^', '_', '`',
-            '{', '|', '}'
+            '{', '|', '}', '.'
         );
 	
     public static List<Character> domainAllowedCharacters = Arrays.asList(
@@ -32,4 +32,8 @@ public class Cstl {
             'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
             '-'
         );
+    
+		public static String[] allowedEndpoints = { "/api/auth/**",
+				// JobController
+				"/api/jobs" };
 }
