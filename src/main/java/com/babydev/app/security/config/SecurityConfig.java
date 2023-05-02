@@ -9,6 +9,8 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+import com.babydev.app.helper.Cstl;
+
 import lombok.RequiredArgsConstructor;
 
 @Configuration
@@ -25,7 +27,7 @@ public class SecurityConfig {
 		.csrf()
 		.disable()
 		.authorizeHttpRequests()
-		.requestMatchers("/api/auth/**")
+		.requestMatchers(Cstl.allowedEndpoints)
 		.permitAll()
 		.anyRequest()
 		.authenticated()

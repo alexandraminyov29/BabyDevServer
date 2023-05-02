@@ -1,12 +1,16 @@
 package com.babydev.app.service.impl;
 
+import java.io.IOException;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.babydev.app.domain.entity.User;
 import com.babydev.app.exception.NotAuthorizedException;
+import com.babydev.app.helper.ImageUtil;
 import com.babydev.app.helper.Permissions;
 import com.babydev.app.repository.UserRepository;
+import com.babydev.app.security.config.JwtService;
 import com.babydev.app.service.facade.UserServiceFacade;
 
 @Service
@@ -14,14 +18,44 @@ public class UserService implements UserServiceFacade {
 	
 	@Autowired
 	UserRepository userRepository;
+	@Autowired
+	JwtService jwtService;
 
 	@Override
-	public void deleteUserById(User user, long id) throws NotAuthorizedException {
+	public User getUserByEmail(String email) {
+		return userRepository.findByEmail(email).get();
+	}
 	
+	@Override
+	public void deleteUserById(String authorizationHeader, long id) throws NotAuthorizedException {
+		User user = getUserFromToken(authorizationHeader);
 		if (!Permissions.isAdmin(user) || Permissions.isUserHimself(user, id)) {
 			throw new NotAuthorizedException();
 		}
 		userRepository.deleteById(id);
 	}
-
+	
+	@Override
+    public void uploadImage(String authorizationHeader, byte[] array) throws IOException {
+        User user = getUserFromToken(authorizationHeader);
+        user.setImageData(ImageUtil.compressImage(array));
+        
+        save(user);
+    }
+	
+	@Override
+	public void updatePhoneNumber(String authorizationHeader, String phoneNumber) {
+		User user = getUserFromToken(authorizationHeader);
+		user.setPhoneNumber(phoneNumber);
+		
+		save(user);
+	}
+    
+    private User save(User user) {
+    	return userRepository.save(user);
+    }
+    
+    private User getUserFromToken(String header) {
+    	return getUserByEmail(jwtService.extractUsernameFromToken(header));
+    }
 }
