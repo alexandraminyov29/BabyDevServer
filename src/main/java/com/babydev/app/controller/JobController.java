@@ -1,5 +1,6 @@
 package com.babydev.app.controller;
 
+import com.babydev.app.domain.dto.JobListViewTypeDTO;
 import com.babydev.app.domain.dto.JobPageDTO;
 import com.babydev.app.domain.entity.Job;
 import com.babydev.app.service.impl.JobService;
@@ -20,8 +21,8 @@ public class JobController {
     private JobService jobService;
 
     @PostMapping("/add")
-    public ResponseEntity<Job> addJob(@RequestBody Job job) {
-        return ResponseEntity.status(HttpStatus.OK).body(jobService.addJob(job));
+    public ResponseEntity<Job> addJob(@RequestBody Job job, @RequestParam Long userId, @RequestParam Long companyId) {
+        return ResponseEntity.status(HttpStatus.OK).body(jobService.addJob(job, userId, companyId));
     }
 
     @DeleteMapping("/{id}")
@@ -36,8 +37,13 @@ public class JobController {
     }
 
     @GetMapping("/all")
-    public ResponseEntity<List<Job>> getJobs() {
-        return ResponseEntity.status(HttpStatus.OK).body(jobService.getJobs());
+    public ResponseEntity<List<JobListViewTypeDTO>> getJobs() {
+        return ResponseEntity.status(HttpStatus.OK).body(jobService.getAllJobs());
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<List<JobListViewTypeDTO>> searchJobs(@RequestParam String keyword) {
+        return ResponseEntity.status(HttpStatus.OK).body(jobService.searchJobs(keyword));
     }
 
 }

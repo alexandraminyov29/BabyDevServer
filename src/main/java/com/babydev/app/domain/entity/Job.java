@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -25,11 +26,17 @@ public class Job {
     @Column(name = "description")
     private String description;
 
+    @Column(name = "location")
+    private Location location;
+
+    @Column(name = "type")
+    private JobType type;
+
     @Column(name = "promoted_until")
     private LocalDateTime promotedUntil;
 
     @Column(name = "post_date")
-    private LocalDateTime postDate;
+    private LocalDate postDate;
 
     @Column(name = "experience_required")
     private String experienceRequired;

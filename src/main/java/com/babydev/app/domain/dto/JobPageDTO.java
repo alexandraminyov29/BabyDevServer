@@ -1,9 +1,11 @@
 package com.babydev.app.domain.dto;
 
+import com.babydev.app.domain.entity.JobType;
+import com.babydev.app.domain.entity.Location;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 @Getter
 @Setter
@@ -15,7 +17,11 @@ public class JobPageDTO {
 
     private String description;
 
-    private LocalDateTime postedDate;
+    private Location location;
+
+    private JobType type;
+
+    private LocalDate postedDate;
 
     private String experienceRequired;
 
@@ -31,14 +37,16 @@ public class JobPageDTO {
         super();
     }
 
-    public JobPageDTO(java.lang.Long id, java.lang.String title, java.lang.String description, java.time.LocalDateTime postedDate, java.lang.String experienceRequired, java.lang.Long companyId, java.lang.String name, byte[] image) {
+    public JobPageDTO(java.lang.Long id, java.lang.String title, java.lang.String description, Location location, JobType type, LocalDate postedDate, java.lang.String experienceRequired, boolean applied, java.lang.Long companyId, java.lang.String name, byte[] image) {
         super();
         this.id = id;
         this.title = title;
         this.description = description;
+        this.location = location;
+        this.type = type;
         this.postedDate = postedDate;
         this.experienceRequired = experienceRequired;
-        this.applied = false;
+        this.applied = applied;
         this.companyId = companyId;
         this.name = name;
         this.image = image;
