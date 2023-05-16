@@ -3,11 +3,13 @@ package com.babydev.app.service.impl;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
@@ -23,6 +25,7 @@ import org.springframework.stereotype.Service;
 import com.babydev.app.domain.auth.AuthenticationRequest;
 import com.babydev.app.domain.auth.AuthenticationResponse;
 import com.babydev.app.domain.auth.RegisterRequest;
+import com.babydev.app.domain.entity.RegistrationToken;
 import com.babydev.app.domain.entity.User;
 import com.babydev.app.domain.entity.UserRole;
 import com.babydev.app.exception.EmailIsTakenException;
@@ -31,11 +34,13 @@ import com.babydev.app.exception.EmailNotValidException;
 import com.babydev.app.exception.EmptyFieldException;
 import com.babydev.app.exception.PasswordConditionsException;
 import com.babydev.app.exception.PhoneNumberFormatException;
+import com.babydev.app.exception.RegistrationTokenNotValidException;
 import com.babydev.app.exception.WrongPasswordException;
 import com.babydev.app.helper.Cstl;
 import com.babydev.app.repository.UserRepository;
 import com.babydev.app.security.config.JwtService;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -46,8 +51,11 @@ public class AuthenticationService {
 	private final PasswordEncoder passwordEncoder;
 	private final JwtService jwtService;
 	private final AuthenticationManager authenticationManager;
+	private final ConfirmationTokenService confirmationTokenService;
+	private final EmailService mailService;
 	
-	public AuthenticationResponse register(RegisterRequest request) throws EmptyFieldException, EmailIsTakenException, EmailNotValidException, PhoneNumberFormatException, PasswordConditionsException {
+	@Transactional
+	public AuthenticationResponse register(RegisterRequest request) throws EmptyFieldException, EmailIsTakenException, EmailNotValidException, PhoneNumberFormatException, PasswordConditionsException, RegistrationTokenNotValidException {
 		checkRegisterRequest(request);
 		User user = User.builder()
 				.firstName(request.getFirstName())
@@ -59,15 +67,48 @@ public class AuthenticationService {
 				.build();
 		
 		repository.save(user);
-		String jwtToken = jwtService.generateToken(user);
-		return AuthenticationResponse.builder()
-				.token(jwtToken)
+		
+		final String token = UUID.randomUUID().toString();
+		
+		RegistrationToken confirmationToken = RegistrationToken.builder()
+				.token(token)
+				.createdAt(LocalDateTime.now())
+				.expiresAt(LocalDateTime.now().plusDays(1))
+				.user(user)
 				.build();
+		
+		confirmationTokenService.saveConfirmationToken(confirmationToken);
+		
+		final String verificationLink = "http://localhost:8080/api/auth/confirm?link=" + confirmationToken.getToken();
+		mailService.sendVerificationLink(user.getEmail(), verificationLink);
+		return null;
 	}
+	
+    @Transactional
+    public String confirmToken(String token) {
+    	RegistrationToken confirmationToken = confirmationTokenService
+                .getToken(token)
+                .orElseThrow(() ->
+                        new IllegalStateException("token not found"));
+
+        if (confirmationToken.getVerifiedAt() != null) {
+            throw new IllegalStateException("email already confirmed");
+        }
+
+        LocalDateTime expiredAt = confirmationToken.getExpiresAt();
+
+        if (expiredAt.isBefore(LocalDateTime.now())) {
+            throw new IllegalStateException("token expired");
+        }
+
+        confirmationTokenService.setConfirmedAt(token);
+        repository.updateActive(confirmationToken.getUser().getUserId(), true);
+        return "confirmed";
+    }
 
 	public AuthenticationResponse authenticate(AuthenticationRequest request)
 			throws EmailNotFoundException, WrongPasswordException, EmptyFieldException {
-		
+		//TODO handle not active
 		if (request.getEmail().length() == 0 || request.getPassword().length() == 0) {
 			throw new EmptyFieldException();
 		}
@@ -95,7 +136,7 @@ public class AuthenticationService {
 		return AuthenticationResponse.builder().token(jwtToken).build();
 	}
 
-	private void checkRegisterRequest(RegisterRequest request) throws EmptyFieldException, EmailIsTakenException, EmailNotValidException, PhoneNumberFormatException, PasswordConditionsException {
+	private void checkRegisterRequest(RegisterRequest request) throws EmptyFieldException, EmailIsTakenException, EmailNotValidException, PhoneNumberFormatException, PasswordConditionsException, RegistrationTokenNotValidException {
 		if (request.getFirstName() == null || request.getLastName() == null || request.getEmail() == null ||
 				request.getPhoneNumber() == null || request.getPassword() == null) {
 			throw new EmptyFieldException();
@@ -141,9 +182,17 @@ public class AuthenticationService {
 		return hasUppercase && hasLowercase && hasDigit && hasSpecialChar;
 	}
 	
-	private void checkEmail(String email) throws EmailIsTakenException, EmailNotValidException {
-		if (repository.findByEmail(email).isPresent()) {
-			throw new EmailIsTakenException();
+	private void checkEmail(String email) throws EmailIsTakenException, EmailNotValidException, RegistrationTokenNotValidException {
+		
+		final Optional<User> user = repository.findByEmail(email);
+		final boolean userAlreadyExists = user.isPresent();
+		if (userAlreadyExists) {
+			if (user.get().isEnabled()) {
+				throw new EmailIsTakenException(); 
+			} else {
+				throw new RegistrationTokenNotValidException();
+			}
+				
 		} else if (!isValidEmail(email)) {
 			throw new EmailNotValidException();
 		}

@@ -2,4 +2,4 @@
 *.class
 
 # Ignore target directory
-target/
+target/*

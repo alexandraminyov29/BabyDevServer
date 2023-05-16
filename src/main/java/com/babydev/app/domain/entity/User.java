@@ -23,6 +23,7 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -35,6 +36,7 @@ import lombok.Setter;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@EqualsAndHashCode
 public class User implements UserDetails{
     @Id
     @Column(name = "id")
@@ -108,7 +110,7 @@ public class User implements UserDetails{
 
 	@Override
 	public boolean isAccountNonLocked() {
-		return true;
+		return !(this.isActive);
 	}
 
 	@Override
@@ -118,7 +120,7 @@ public class User implements UserDetails{
 
 	@Override
 	public boolean isEnabled() {
-		return true;
+		return this.isActive;
 	}
 
 }

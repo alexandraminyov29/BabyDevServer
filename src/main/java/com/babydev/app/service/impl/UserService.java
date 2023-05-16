@@ -1,6 +1,7 @@
 package com.babydev.app.service.impl;
 
 import java.io.IOException;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -50,6 +51,11 @@ public class UserService implements UserServiceFacade {
 		
 		save(user);
 	}
+	
+	public List<User> findAllActiveUsers() {
+		List<User> users = userRepository.findAllByIsActive(true);
+		return users;
+	}
     
     private User save(User user) {
     	return userRepository.save(user);
@@ -58,4 +64,5 @@ public class UserService implements UserServiceFacade {
     private User getUserFromToken(String header) {
     	return getUserByEmail(jwtService.extractUsernameFromToken(header));
     }
+    
 }

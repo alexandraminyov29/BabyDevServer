@@ -1,9 +1,12 @@
 package com.babydev.app.controller;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.babydev.app.domain.auth.AuthenticationRequest;
@@ -15,6 +18,7 @@ import com.babydev.app.exception.EmailNotValidException;
 import com.babydev.app.exception.EmptyFieldException;
 import com.babydev.app.exception.PasswordConditionsException;
 import com.babydev.app.exception.PhoneNumberFormatException;
+import com.babydev.app.exception.RegistrationTokenNotValidException;
 import com.babydev.app.exception.WrongPasswordException;
 import com.babydev.app.service.impl.AuthenticationService;
 
@@ -32,8 +36,8 @@ public class AuthenticationController {
 			@RequestBody RegisterRequest request
 			) {
 		try {
-			AuthenticationResponse response = service.register(request);
-			return ResponseEntity.ok(response);
+			service.register(request);
+			return new ResponseEntity<Object>("OK", HttpStatus.OK);
 		} catch (EmptyFieldException e) {
 			return AdviceController.handleEmptyFieldException(e);
 		} catch (EmailIsTakenException e) {
@@ -44,8 +48,15 @@ public class AuthenticationController {
 			return AdviceController.handlePhoneNumberFormat(e);
 		} catch (PasswordConditionsException e) {
 			return AdviceController.handlePasswordConditionsNotMet(e);
+		} catch (RegistrationTokenNotValidException e) {
+			return AdviceController.handleRegistrationTokenIsNotValid(e);
 		}
 	}
+	
+    @GetMapping("/confirm")
+    public String confirm(@RequestParam("link") String token) {
+        return service.confirmToken(token);
+    }
 	
 	@PostMapping("/authenticate")
 	public ResponseEntity<Object> authenticate(

@@ -12,6 +12,7 @@ import com.babydev.app.exception.EmptyFieldException;
 import com.babydev.app.exception.NotAuthorizedException;
 import com.babydev.app.exception.PasswordConditionsException;
 import com.babydev.app.exception.PhoneNumberFormatException;
+import com.babydev.app.exception.RegistrationTokenNotValidException;
 import com.babydev.app.exception.WrongPasswordException;
 
 @ControllerAdvice
@@ -55,5 +56,10 @@ public class AdviceController {
 	@ExceptionHandler
 	public static ResponseEntity<Object> handlePasswordConditionsNotMet(PasswordConditionsException exception) {
 		return new ResponseEntity<Object>(exception.getMessage(), HttpStatus.EXPECTATION_FAILED);
+	}
+	
+	@ExceptionHandler
+	public static ResponseEntity<Object> handleRegistrationTokenIsNotValid(RegistrationTokenNotValidException exception) {
+		return new ResponseEntity<Object>(exception.getMessage(), HttpStatus.TOO_EARLY);
 	}
 }
