@@ -110,7 +110,7 @@ public class User implements UserDetails{
 
 	@Override
 	public boolean isAccountNonLocked() {
-		return !(this.isActive);
+		return this.isActive;
 	}
 
 	@Override
