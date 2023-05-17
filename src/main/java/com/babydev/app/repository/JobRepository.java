@@ -40,8 +40,4 @@ public interface JobRepository extends JpaRepository<Job,Long> {
             "WHERE (job.title LIKE %:keyword% OR job.location LIKE %:keyword% )")
     List<JobListViewTypeDTO> searchJobs(@Param("keyword") String keyword);
 
-
-
-
-
 }

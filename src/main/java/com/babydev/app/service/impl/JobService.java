@@ -4,20 +4,19 @@ import com.babydev.app.domain.dto.JobListViewTypeDTO;
 import com.babydev.app.domain.dto.JobPageDTO;
 import com.babydev.app.domain.entity.Job;
 import com.babydev.app.domain.entity.Location;
+import com.babydev.app.domain.entity.User;
 import com.babydev.app.repository.CompanyRepository;
 import com.babydev.app.repository.JobRepository;
 import com.babydev.app.repository.UserRepository;
 import com.babydev.app.service.facade.JobServiceFacade;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -101,4 +100,19 @@ public class JobService implements JobServiceFacade {
 
         return jobsDTO;
     }
+
+    public void applyJob(Long userId, Long jobId){
+        Optional<Job> job = jobRepository.findById(jobId);
+        if(job.isEmpty()) {
+            throw new EntityNotFoundException("Couldn't find job");
+        }
+        Optional<User> user = userRepository.findById(userId);
+        if(user.isEmpty()) {
+            throw new EntityNotFoundException("Couldn't find user");
+        }
+
+        job.get().getApplicants().add(user.get());
+        jobRepository.save(job.get());
+    }
+
 }
