@@ -26,3 +26,8 @@ spring:
         dialect: org.hibernate.dialect.MySQL57Dialect
 #logging.level.org.springframework.web: DEBUG
 #logging.level.org.hibernate: DEBUG
+logging:
+  level:
+    org:
+      springframework:
+        security: DEBUG

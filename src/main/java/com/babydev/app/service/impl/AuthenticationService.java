@@ -130,6 +130,7 @@ public class AuthenticationService {
 		additionalClaims.put("firstName", user.getFirstName());
 		additionalClaims.put("lastName", user.getLastName());
 		additionalClaims.put("role", user.getRole());
+		additionalClaims.put("id", user.getUserId());
 		// TODO: add image
 		
 		String jwtToken = jwtService.generateToken(additionalClaims, user);
