@@ -4,6 +4,7 @@ import com.babydev.app.domain.dto.JobListViewTypeDTO;
 import com.babydev.app.domain.dto.JobPageDTO;
 import com.babydev.app.domain.entity.Job;
 import com.babydev.app.service.impl.JobService;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -44,6 +45,16 @@ public class JobController {
     @GetMapping("/search")
     public ResponseEntity<List<JobListViewTypeDTO>> searchJobs(@RequestParam String keyword) {
         return ResponseEntity.status(HttpStatus.OK).body(jobService.searchJobs(keyword));
+    }
+
+    @PostMapping("/apply")
+    public ResponseEntity<?> applyToJob(@RequestParam(value = "userId") Long userId, @RequestParam(value = "jobId") Long jobId){
+        try{
+            jobService.applyJob(userId, jobId);
+            return ResponseEntity.status(HttpStatus.OK).body("Applied to job, good luck!");
+        }catch(EntityNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        }
     }
 
 }

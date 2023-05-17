@@ -1,11 +1,5 @@
 package com.babydev.app.service.impl;
 
-import java.io.IOException;
-import java.util.List;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import com.babydev.app.domain.entity.User;
 import com.babydev.app.exception.NotAuthorizedException;
 import com.babydev.app.helper.ImageUtil;
@@ -13,6 +7,11 @@ import com.babydev.app.helper.Permissions;
 import com.babydev.app.repository.UserRepository;
 import com.babydev.app.security.config.JwtService;
 import com.babydev.app.service.facade.UserServiceFacade;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.io.IOException;
+import java.util.List;
 
 @Service
 public class UserService implements UserServiceFacade {
@@ -64,5 +63,4 @@ public class UserService implements UserServiceFacade {
     private User getUserFromToken(String header) {
     	return getUserByEmail(jwtService.extractUsernameFromToken(header));
     }
-    
 }

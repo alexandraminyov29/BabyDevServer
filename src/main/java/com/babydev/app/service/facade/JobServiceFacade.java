@@ -19,6 +19,8 @@ public interface JobServiceFacade {
 
     public JobPageDTO findJobById(Long jobId, Long userId);
 
+
+
   //  public List<JobListViewTypeDTO> sortAscJobsByDateOfPosting(List<JobListViewTypeDTO> jobs);
 
    // public List<JobListViewTypeDTO> sortDescJobsByDateOfPosting(List<JobListViewTypeDTO> jobs);
@@ -27,5 +29,6 @@ public interface JobServiceFacade {
 
  //   public List<JobListViewTypeDTO> searchJobs(String keyword);
 
+    public void applyJob(Long userId, Long jobId);
 
 }
