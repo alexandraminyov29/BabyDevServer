@@ -1,21 +1,18 @@
 package com.babydev.app.security.config;
 
-import java.security.Key;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.function.Function;
-
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.stereotype.Service;
-
-import com.babydev.app.domain.entity.User;
-
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.stereotype.Service;
+
+import java.security.Key;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.function.Function;
 
 @Service
 public class JwtService {
@@ -86,6 +83,11 @@ public class JwtService {
 	public String extractUsernameFromToken(String header) {
 		final String token = header.substring("Bearer ".length());
 		return extractUsername(token);
+	}
+
+	public Long extractUserIdFromToken(String header) {
+		final String token = header.substring("Bearer ".length());
+		return extractClaim(token, claims -> claims.get("id", Long.class));
 	}
 
 }

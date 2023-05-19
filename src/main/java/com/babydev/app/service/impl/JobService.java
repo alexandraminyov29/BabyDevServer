@@ -8,6 +8,7 @@ import com.babydev.app.domain.entity.User;
 import com.babydev.app.repository.CompanyRepository;
 import com.babydev.app.repository.JobRepository;
 import com.babydev.app.repository.UserRepository;
+import com.babydev.app.security.config.JwtService;
 import com.babydev.app.service.facade.JobServiceFacade;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +26,8 @@ public class JobService implements JobServiceFacade {
     private final JobRepository jobRepository;
     private final UserRepository userRepository;
     private final CompanyRepository companyRepository;
+
+    private final JwtService jwtService;
 
     public List<Job> getJobs() {
         return jobRepository.findAll();
@@ -101,18 +104,42 @@ public class JobService implements JobServiceFacade {
         return jobsDTO;
     }
 
-    public void applyJob(Long userId, Long jobId){
+    public void applyJob(String token, Long jobId) {
         Optional<Job> job = jobRepository.findById(jobId);
         if(job.isEmpty()) {
             throw new EntityNotFoundException("Couldn't find job");
         }
+        Long userId = jwtService.extractUserIdFromToken(token);
         Optional<User> user = userRepository.findById(userId);
         if(user.isEmpty()) {
             throw new EntityNotFoundException("Couldn't find user");
         }
-
         job.get().getApplicants().add(user.get());
         jobRepository.save(job.get());
+    }
+
+    public boolean addJobToFavorites(String token, Long jobId) {
+
+        Optional<Job> job = jobRepository.findById(jobId);
+        if(job.isEmpty()) {
+            throw new EntityNotFoundException("Couldn't find job");
+        }
+
+        Long userId = jwtService.extractUserIdFromToken(token);
+        Optional<User> user = userRepository.findById(userId);
+        if(user.isEmpty()) {
+            throw new EntityNotFoundException("Couldn't find user");
+        }
+        boolean isFavorite = user.get().getFavoriteJobs().contains(job.get());
+
+        if (isFavorite) {
+            user.get().getFavoriteJobs().remove(job.get());
+        } else {
+            user.get().getFavoriteJobs().add(job.get());
+        }
+        userRepository.save(user.get());
+
+        return isFavorite;
     }
 
 }

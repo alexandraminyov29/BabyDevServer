@@ -36,7 +36,6 @@ public class Cstl {
 		public static String[] allowedEndpoints = { "/api/auth/**",
 				// JobController
 				"/api/jobs/all",
-				"/api/jobs/search",
-				"/api/jobs/apply/**"
+				"/api/jobs/search"
 		};
 }

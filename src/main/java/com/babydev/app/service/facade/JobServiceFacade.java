@@ -29,6 +29,8 @@ public interface JobServiceFacade {
 
  //   public List<JobListViewTypeDTO> searchJobs(String keyword);
 
-    public void applyJob(Long userId, Long jobId);
+    public void applyJob(String token, Long jobId);
+
+    public boolean addJobToFavorites(String token, Long jobId);
 
 }

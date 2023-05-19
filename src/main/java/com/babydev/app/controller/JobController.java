@@ -48,13 +48,26 @@ public class JobController {
     }
 
     @PostMapping("/apply")
-    public ResponseEntity<?> applyToJob(@RequestParam(value = "userId") Long userId, @RequestParam(value = "jobId") Long jobId){
-        try{
-            jobService.applyJob(userId, jobId);
-            return ResponseEntity.status(HttpStatus.OK).body("Applied to job, good luck!");
-        }catch(EntityNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+    public ResponseEntity<?> applyToJob(@RequestHeader(value = "Authorization") String authorizationHeader, @RequestParam(value = "jobId") Long jobId) {
+        try {
+             jobService.applyJob(authorizationHeader, jobId);
+             return ResponseEntity.status(HttpStatus.OK).body("Applied to job, good luck!");
+        } catch (EntityNotFoundException e) {
+                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }
     }
 
+    @PostMapping("/favorite")
+    public ResponseEntity<?> addJobToFavorites(@RequestHeader(value = "Authorization") String authorizationHeader, @RequestParam(value = "jobId") Long jobId, @RequestParam boolean isFavorite) {
+        try {
+            isFavorite = jobService.addJobToFavorites(authorizationHeader, jobId);
+            if (!isFavorite) {
+                return ResponseEntity.status(HttpStatus.OK).body("Job added to favorites!");
+            } else {
+                return ResponseEntity.status(HttpStatus.OK).body("Job removed from favorites!");
+            }
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        }
+    }
 }
