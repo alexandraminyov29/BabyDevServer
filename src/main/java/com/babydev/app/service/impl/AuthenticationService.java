@@ -37,6 +37,7 @@ import com.babydev.app.exception.PhoneNumberFormatException;
 import com.babydev.app.exception.RegistrationTokenNotValidException;
 import com.babydev.app.exception.WrongPasswordException;
 import com.babydev.app.helper.Cstl;
+import com.babydev.app.helper.ImageUtil;
 import com.babydev.app.repository.UserRepository;
 import com.babydev.app.security.config.JwtService;
 
@@ -64,6 +65,7 @@ public class AuthenticationService {
 				.phoneNumber(request.getPhoneNumber())
 				.password(passwordEncoder.encode(request.getPassword()))
 				.role(UserRole.STANDARD)
+				.imageData(new byte[0])
 				.build();
 		
 		repository.save(user);
@@ -131,10 +133,9 @@ public class AuthenticationService {
 		additionalClaims.put("lastName", user.getLastName());
 		additionalClaims.put("role", user.getRole());
 		additionalClaims.put("id", user.getUserId());
-		// TODO: add image
 		
 		String jwtToken = jwtService.generateToken(additionalClaims, user);
-		return AuthenticationResponse.builder().token(jwtToken).build();
+		return AuthenticationResponse.builder().token(jwtToken).photo(ImageUtil.decompressImage(user.getImageData())).build();
 	}
 
 	private void checkRegisterRequest(RegisterRequest request) throws EmptyFieldException, EmailIsTakenException, EmailNotValidException, PhoneNumberFormatException, PasswordConditionsException, RegistrationTokenNotValidException {

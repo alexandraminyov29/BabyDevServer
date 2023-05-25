@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -49,12 +50,33 @@ public class UserController {
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 	
+//	@PatchMapping(value = "/image")
+//    public ResponseEntity<String> uploadImage(@RequestHeader("Authorization") String authorizationHeader, 
+//    		@RequestParam("file") MultipartFile file) {
+//        try {
+//            byte[] imageData = file.getBytes();
+//            userService.uploadImage(authorizationHeader, imageData);
+//            return ResponseEntity.ok("Image uploaded successfully.");
+//        } catch (IOException e) {
+//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to upload image.");
+//        }
+//    }
+	
 	@PatchMapping(value = "/phoneno")
 	public ResponseEntity<?> updatePhoneNumber(@RequestHeader("Authorization") String authorizationHeader,
 			@RequestBody String newPhoneNumber) {
 		userService.updatePhoneNumber(authorizationHeader, newPhoneNumber);
 		return new ResponseEntity<>(HttpStatus.OK);
-		
 	}
 	
+	@GetMapping(value = "/myprofile")
+	public ResponseEntity<?> getMyPersonalInformation(@RequestHeader("Authorization") String authorizationHeader,
+			@RequestParam int tab) {
+		Object result = userService.getMyPersonalInformationByTab(authorizationHeader, tab);
+		if (result != null) {
+			return ResponseEntity.status(HttpStatus.OK).body(result);
+		} else {
+			return new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE);
+		}
+	}
 }
