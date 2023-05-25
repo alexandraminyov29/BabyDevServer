@@ -1,22 +1,18 @@
 package com.babydev.app.controller;
 
-import java.io.IOException;
-
+import com.babydev.app.domain.entity.Job;
+import com.babydev.app.exception.NotAuthorizedException;
+import com.babydev.app.service.impl.UserService;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
-import com.babydev.app.exception.NotAuthorizedException;
-import com.babydev.app.service.impl.UserService;
+import java.io.IOException;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/users")
@@ -55,6 +51,15 @@ public class UserController {
 		userService.updatePhoneNumber(authorizationHeader, newPhoneNumber);
 		return new ResponseEntity<>(HttpStatus.OK);
 		
+	}
+	@GetMapping("/favorite")
+	public ResponseEntity<?> getUserFavorites(@RequestHeader(value = "Authorization") String authorizationHeader) {
+		try {
+			List<Job> favoriteJobs = userService.getFavoriteJobs(authorizationHeader);
+			return ResponseEntity.status(HttpStatus.OK).body(favoriteJobs);
+		} catch (EntityNotFoundException e) {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+		}
 	}
 	
 }

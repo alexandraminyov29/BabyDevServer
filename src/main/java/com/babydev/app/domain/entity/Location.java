@@ -1,21 +1,21 @@
 package com.babydev.app.domain.entity;
 
 public enum Location {
-    București,
+    Bucuresti,
     Cluj,
-    Timișoara,
-    Iași,
-    Constanța,
+    Timisoara,
+    Iasi,
+    Constanta,
     Craiova,
-    Brașov,
-    Galați,
-    Ploiești,
+    Brasov,
+    Galati,
+    Ploiesti,
     Oradea,
-    Brăila,
+    Braila,
     Arad,
-    Pitești,
+    Pitesti,
     Sibiu,
-    Bacău,
-    Buzău,
-    Botoșani
+    Bacau,
+    Buzau,
+    Botosani
 }

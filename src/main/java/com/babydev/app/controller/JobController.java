@@ -43,8 +43,9 @@ public class JobController {
     }
 
     @GetMapping("/search")
-    public ResponseEntity<List<JobListViewTypeDTO>> searchJobs(@RequestParam String keyword) {
-        return ResponseEntity.status(HttpStatus.OK).body(jobService.searchJobs(keyword));
+    public ResponseEntity<List<JobListViewTypeDTO>> searchJobs(@RequestHeader(value = "Authorization") String authorizationHeader,
+                                                               @RequestParam String keyword) {
+        return ResponseEntity.status(HttpStatus.OK).body(jobService.searchJobs(keyword, authorizationHeader));
     }
 
     @PostMapping("/apply")
@@ -68,6 +69,16 @@ public class JobController {
             }
         } catch (EntityNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        }
+    }
+
+    @GetMapping("/location")
+    public ResponseEntity<List<JobListViewTypeDTO>> getJobsByLocation(@RequestParam String location) {
+        try {
+            List<JobListViewTypeDTO> filteredJobs = jobService.getJobsByLocation(location);
+            return ResponseEntity.status(HttpStatus.OK).body(filteredJobs);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         }
     }
 }

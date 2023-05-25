@@ -33,11 +33,14 @@ public interface JobRepository extends JpaRepository<Job,Long> {
             "WHERE job.jobId =:jobId", nativeQuery = false)
     JobPageDTO findJobDetails(@Param("jobId") long jobId, @Param("userId") long userId);
 
-    @Query(value = "SELECT NEW com.babydev.app.domain.dto.JobListViewTypeDTO(job.id, job.title, job.location, job.type,  " +
-            "job.experienceRequired, company.id, company.name, company.image) " +
+    @Query(value = "SELECT NEW com.babydev.app.domain.dto.JobListViewTypeDTO(job.id, job.title, job.location, job.type, " +
+            "CASE WHEN uf.userId =:userId AND :userId != '' THEN TRUE ELSE FALSE END, job.experienceRequired, company.id, company.name, company.image) " +
             "FROM Job job " +
             "LEFT JOIN job.company company " +
-            "WHERE (job.title LIKE %:keyword% OR job.location LIKE %:keyword% )")
-    List<JobListViewTypeDTO> searchJobs(@Param("keyword") String keyword);
+            "LEFT JOIN job.usersFavorites uf " +
+            "WHERE (job.title LIKE %:keyword%)")
+    List<JobListViewTypeDTO> searchJobs(@Param("keyword") String keyword, @Param("userId") String userId);
+
+
 
 }
