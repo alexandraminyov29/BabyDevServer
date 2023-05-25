@@ -11,6 +11,7 @@ import com.babydev.app.repository.UserRepository;
 import com.babydev.app.security.config.JwtService;
 import com.babydev.app.service.facade.JobServiceFacade;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -18,6 +19,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -45,8 +47,15 @@ public class JobService implements JobServiceFacade {
         return jobRepository.save(job);
     }
 
-    public List<JobListViewTypeDTO> searchJobs(String keyword) {
-        return jobRepository.searchJobs(keyword);
+    public List<JobListViewTypeDTO> searchJobs(String keyword, String token) {
+        String userId;
+        if (token != "") {
+            userId = jwtService.extractUserIdFromToken(token).toString();
+        } else {
+            userId = "";
+        }
+
+        return jobRepository.searchJobs(keyword, userId);
     }
 
     public void deleteJob(Long id) {
@@ -78,20 +87,17 @@ public class JobService implements JobServiceFacade {
 //        return jobs;
 //    }
 
-    public List<JobListViewTypeDTO> sortByLocation(List<JobListViewTypeDTO> jobs, Location location) {
-         Collections.sort(jobs, new Comparator<JobListViewTypeDTO>() {
-             @Override
-             public int compare(JobListViewTypeDTO j1, JobListViewTypeDTO j2) {
-                 Location firstLocation = j1.getLocation();
-                 Location secondLocation = j2.getLocation();
+    public List<JobListViewTypeDTO> getJobsByLocation(String location) {
+        List<JobListViewTypeDTO> jobs = getAllJobs();
 
-                 int j1Distance = Math.abs(firstLocation.ordinal() - location.ordinal());
-                 int j2Distance = Math.abs(secondLocation.ordinal() - location.ordinal());
-
-                 return Integer.compare(j1Distance,j2Distance);
-             }
-         });
-         return jobs;
+        List<JobListViewTypeDTO> filteredJobs = jobs.stream()
+                .filter(job -> job.getLocation() == Location.valueOf(location))
+                .collect(Collectors.toList());
+        if(filteredJobs.isEmpty()) {
+            throw new IllegalArgumentException("Couldn't find job");
+        } else {
+            return filteredJobs;
+        }
     }
 
     public List<JobListViewTypeDTO> getAllJobs() {
@@ -118,6 +124,7 @@ public class JobService implements JobServiceFacade {
         jobRepository.save(job.get());
     }
 
+    @Transactional
     public boolean addJobToFavorites(String token, Long jobId) {
 
         Optional<Job> job = jobRepository.findById(jobId);
@@ -134,10 +141,13 @@ public class JobService implements JobServiceFacade {
 
         if (isFavorite) {
             user.get().getFavoriteJobs().remove(job.get());
+            job.get().getUsersFavorites().remove(user.get());
         } else {
             user.get().getFavoriteJobs().add(job.get());
+            job.get().getUsersFavorites().add(user.get());
         }
         userRepository.save(user.get());
+        jobRepository.save(job.get());
 
         return isFavorite;
     }

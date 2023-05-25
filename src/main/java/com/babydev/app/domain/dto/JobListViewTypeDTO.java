@@ -19,6 +19,8 @@ public class JobListViewTypeDTO {
 
     private JobType type;
 
+    private boolean isFavorite;
+
  //   private LocalDate postedDate;
 
     private String experienceRequired;
@@ -52,11 +54,12 @@ public class JobListViewTypeDTO {
 
     }
 
-    public JobListViewTypeDTO(Long id, String title,Location location, JobType type, String experienceRequired, Long companyId, String name, byte[] image) {
+    public JobListViewTypeDTO(Long id, String title,Location location, JobType type, boolean isFavorite, String experienceRequired, Long companyId, String name, byte[] image) {
         this.id = id;
         this.title = title;
         this.location = location;
         this.type = type;
+        this.isFavorite = isFavorite;
       //  this.postedDate = postedDate;
         this.experienceRequired = experienceRequired;
         this.companyId = companyId;

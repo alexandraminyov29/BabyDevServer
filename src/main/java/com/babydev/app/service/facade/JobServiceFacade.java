@@ -3,7 +3,6 @@ package com.babydev.app.service.facade;
 import com.babydev.app.domain.dto.JobListViewTypeDTO;
 import com.babydev.app.domain.dto.JobPageDTO;
 import com.babydev.app.domain.entity.Job;
-import com.babydev.app.domain.entity.Location;
 
 import java.util.List;
 
@@ -25,7 +24,7 @@ public interface JobServiceFacade {
 
    // public List<JobListViewTypeDTO> sortDescJobsByDateOfPosting(List<JobListViewTypeDTO> jobs);
 
-    public List<JobListViewTypeDTO> sortByLocation(List<JobListViewTypeDTO> jobs, Location location);
+    public List<JobListViewTypeDTO> getJobsByLocation(String location);
 
  //   public List<JobListViewTypeDTO> searchJobs(String keyword);
 

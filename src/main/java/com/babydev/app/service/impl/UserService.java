@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.babydev.app.domain.dto.PersonalInformationDTO;
+import com.babydev.app.domain.entity.Job;
 import com.babydev.app.domain.entity.User;
 import com.babydev.app.exception.NotAuthorizedException;
 import com.babydev.app.helper.ImageUtil;
@@ -26,6 +27,11 @@ public class UserService implements UserServiceFacade {
 	@Override
 	public User getUserByEmail(String email) {
 		return userRepository.findByEmail(email).get();
+	}
+
+	public List<Job> getFavoriteJobs(String token) {
+		User user = getUserFromToken(token);
+		return user.getFavoriteJobs();
 	}
 	
 	@Override

@@ -1,7 +1,9 @@
 package com.babydev.app.controller;
 
-import java.io.IOException;
-
+import com.babydev.app.domain.entity.Job;
+import com.babydev.app.exception.NotAuthorizedException;
+import com.babydev.app.service.impl.UserService;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpStatus;
@@ -16,8 +18,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.babydev.app.exception.NotAuthorizedException;
-import com.babydev.app.service.impl.UserService;
+import java.io.IOException;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/users")
@@ -50,23 +52,20 @@ public class UserController {
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 	
-//	@PatchMapping(value = "/image")
-//    public ResponseEntity<String> uploadImage(@RequestHeader("Authorization") String authorizationHeader, 
-//    		@RequestParam("file") MultipartFile file) {
-//        try {
-//            byte[] imageData = file.getBytes();
-//            userService.uploadImage(authorizationHeader, imageData);
-//            return ResponseEntity.ok("Image uploaded successfully.");
-//        } catch (IOException e) {
-//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to upload image.");
-//        }
-//    }
-	
 	@PatchMapping(value = "/phoneno")
 	public ResponseEntity<?> updatePhoneNumber(@RequestHeader("Authorization") String authorizationHeader,
 			@RequestBody String newPhoneNumber) {
 		userService.updatePhoneNumber(authorizationHeader, newPhoneNumber);
 		return new ResponseEntity<>(HttpStatus.OK);
+	}
+	@GetMapping("/favorite")
+	public ResponseEntity<?> getUserFavorites(@RequestHeader(value = "Authorization") String authorizationHeader) {
+		try {
+			List<Job> favoriteJobs = userService.getFavoriteJobs(authorizationHeader);
+			return ResponseEntity.status(HttpStatus.OK).body(favoriteJobs);
+		} catch (EntityNotFoundException e) {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+		}
 	}
 	
 	@GetMapping(value = "/myprofile")
