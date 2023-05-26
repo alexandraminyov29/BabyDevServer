@@ -62,7 +62,6 @@ public class UserService implements UserServiceFacade {
 	public Object getMyPersonalInformationByTab(String token, int tab) {
 		
 		User user = getUserFromToken(token);
-		//if (Permissions.isUserHimself(user, ))
 		switch (tab) {
 			// Get all user info (NO TAB)
 			case 0:
@@ -91,11 +90,11 @@ public class UserService implements UserServiceFacade {
 		return users;
 	}
     
-    private User save(User user) {
+    public User save(User user) {
     	return userRepository.save(user);
     }
     
-    private User getUserFromToken(String header) {
+    public User getUserFromToken(String header) {
     	return getUserByEmail(jwtService.extractUsernameFromToken(header));
     }
 }
