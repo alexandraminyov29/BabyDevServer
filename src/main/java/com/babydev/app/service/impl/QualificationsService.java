@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.Iterator;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +23,8 @@ import com.babydev.app.helper.Permissions;
 import com.babydev.app.repository.qualifications.EducationRepository;
 import com.babydev.app.repository.qualifications.ExperienceRepository;
 import com.babydev.app.repository.qualifications.SkillRepository;
+
+import jakarta.transaction.Transactional;
 
 @Service
 public class QualificationsService {
@@ -182,6 +185,35 @@ public class QualificationsService {
 		return skillDTO;
 	}
 	
+	@Transactional
+	public List<SkillDTO> updateSkills(String authorizationHeader, String email, List<SkillDTO> newSkills) throws NotAuthorizedException {
+		User user = canModifyQualification(authorizationHeader, email);
+		
+		List<Skill> oldSkills = user.getSkills();
+	    Iterator<Skill> iterator = oldSkills.iterator();
+	    while (iterator.hasNext()) {
+	        Skill skill = iterator.next();
+	        skillRepository.deleteById(skill.getSkillId());
+	        iterator.remove();
+	    }
+		
+		List<Skill> userSkills = new ArrayList<Skill>();
+		Skill newSkill;
+		for (SkillDTO skill: newSkills) {
+			newSkill = Skill.builder()
+					.skillName(skill.getSkillName())
+					.skillExperience(skill.getSkillExperience())
+					.user(user)
+					.build();
+			
+			userSkills.add(newSkill);
+		}
+		
+		user.setSkills(userSkills);
+		userService.save(user);
+		return newSkills;
+	}
+	
 	public ExperienceDTO updateExperience(String authorizationHeader, String email, 
 			ExperienceDTO experienceDTO) throws NotAuthorizedException {
 		canModifyQualification(authorizationHeader, email);
@@ -210,12 +242,13 @@ public class QualificationsService {
 		return experienceDTO;
 	}
 	
-	private void canModifyQualification(final String token, final String email) throws NotAuthorizedException {
+	private User canModifyQualification(final String token, final String email) throws NotAuthorizedException {
 		User user = userService.getUserFromToken(token);
 		final boolean isStandardUser = Permissions.isStandard(user);
 		if (!user.getEmail().equals(email) || !isStandardUser) {
 			throw new NotAuthorizedException();
 		}
+		return user;
 	}
 	
 	private User getUserBasedOnAuthority(final String token, final String email) throws NotAuthorizedException {
@@ -317,4 +350,6 @@ public class QualificationsService {
 				.dateTo(dateTo)
 				.build();
 	}
+
+
 }

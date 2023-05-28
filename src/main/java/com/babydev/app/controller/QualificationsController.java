@@ -1,5 +1,7 @@
 package com.babydev.app.controller;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -146,19 +148,19 @@ public class QualificationsController {
 		}
 	}
 	
-	@PutMapping("/skill")
-	public ResponseEntity<?> updateSkill (
-			@RequestHeader("Authorization") String authorizationHeader, 
-			@RequestParam String email,
-			@RequestBody SkillDTO skillDTO) {
-		try {
-			
-			return ResponseEntity.status(HttpStatus.OK).body(qualificationsService.updateSkill(
-					authorizationHeader, email, skillDTO));	
-		} catch (NotAuthorizedException e) {
-			return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED).body("METHOD NOT ALLOWED");
-		}
-	}
+//	@PutMapping("/skill")
+//	public ResponseEntity<?> updateSkill (
+//			@RequestHeader("Authorization") String authorizationHeader, 
+//			@RequestParam String email,
+//			@RequestBody SkillDTO skillDTO) {
+//		try {
+//			
+//			return ResponseEntity.status(HttpStatus.OK).body(qualificationsService.updateSkill(
+//					authorizationHeader, email, skillDTO));	
+//		} catch (NotAuthorizedException e) {
+//			return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED).body("METHOD NOT ALLOWED");
+//		}
+//	}
 	
 	@PutMapping("/experience")
 	public ResponseEntity<?> updateExperience (
@@ -169,6 +171,20 @@ public class QualificationsController {
 			
 			return ResponseEntity.status(HttpStatus.OK).body(qualificationsService.updateExperience(
 					authorizationHeader, email, experienceDTO));	
+		} catch (NotAuthorizedException e) {
+			return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED).body("METHOD NOT ALLOWED");
+		}
+	}
+	
+	@PutMapping("/skill")
+	public ResponseEntity<?> updateSkills (
+			@RequestHeader("Authorization") String authorizationHeader, 
+			@RequestParam String email,
+			@RequestBody List<SkillDTO> skills) {
+		try {
+			
+			return ResponseEntity.status(HttpStatus.OK).body(qualificationsService.updateSkills(
+					authorizationHeader, email, skills));	
 		} catch (NotAuthorizedException e) {
 			return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED).body("METHOD NOT ALLOWED");
 		}
