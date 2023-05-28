@@ -10,7 +10,7 @@ import lombok.Setter;
 @Builder
 @AllArgsConstructor
 public class ExperienceDTO {
-	private short priority;
+	private long id;
 	private String title;
 	private String companyName;
 	private String position;

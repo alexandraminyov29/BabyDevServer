@@ -33,9 +33,6 @@ public class Education {
     @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long educationId;
-    
-    @Column(name = "prio")
-    private short priority;
 
     @Column(name = "institution")
     private String institution;

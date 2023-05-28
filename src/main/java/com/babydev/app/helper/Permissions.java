@@ -30,6 +30,15 @@ public class Permissions {
 		return userToCheck.getRole() == UserRole.RECRUITER && isActive(userToCheck);
 	}
 	
+	/**
+	 *  Method that checks if the user's role is standard
+	 *  
+	 *  @param userToCheck the user to be checked
+	 */
+	public static boolean isStandard(final User userToCheck) {
+		return userToCheck.getRole() == UserRole.STANDARD && isActive(userToCheck);
+	}
+	
 	public static boolean isActive(final User userToCheck) {
 		return userToCheck.isActive();
 	}

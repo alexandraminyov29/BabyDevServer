@@ -31,9 +31,6 @@ public class Skill {
     @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long skillId;
-    
-    @Column(name = "prio")
-    private short priority;
 
     @Column(name = "skill_name")
     private String skillName;

@@ -31,9 +31,6 @@ public class Experience {
     @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long experienceId;
-    
-    @Column(name = "prio")
-    private short priority;
 
     @Column(name = "title")
     private String title;

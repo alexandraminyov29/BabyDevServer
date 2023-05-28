@@ -10,7 +10,7 @@ import lombok.Setter;
 @Builder
 @AllArgsConstructor
 public class EducationDTO {
-	private short priority;
+	private long id;
     private String institution;
     private String subject;
     private String dateFrom;

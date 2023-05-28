@@ -12,7 +12,7 @@ import lombok.Setter;
 @Builder
 @AllArgsConstructor
 public class SkillDTO {
-	private short priority;
+	private long id;
 	private String skillName;
 	private ExperienceRating skillExperience;
 }
