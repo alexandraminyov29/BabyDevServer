@@ -61,6 +61,10 @@ public class User implements UserDetails{
     @Column(name = "is_active")
     private boolean isActive;
     
+    @Column(name = "has_cv")
+    @Builder.Default
+    private boolean hasCv = false;
+    
     @Column(name = "user_role")
     @Enumerated(EnumType.STRING)
     private UserRole role;

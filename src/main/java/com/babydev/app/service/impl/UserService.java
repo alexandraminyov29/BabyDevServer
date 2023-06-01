@@ -97,4 +97,8 @@ public class UserService implements UserServiceFacade {
     public User getUserFromToken(String header) {
     	return getUserByEmail(jwtService.extractUsernameFromToken(header));
     }
+
+	public boolean hasCv(String email) {
+		return getUserByEmail(email).isHasCv();
+	}
 }

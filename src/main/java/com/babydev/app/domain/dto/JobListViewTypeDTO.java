@@ -4,6 +4,8 @@ import com.babydev.app.domain.entity.Company;
 import com.babydev.app.domain.entity.Job;
 import com.babydev.app.domain.entity.JobType;
 import com.babydev.app.domain.entity.Location;
+import com.babydev.app.helper.FormatUtil;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -21,7 +23,7 @@ public class JobListViewTypeDTO {
 
     private boolean isFavorite;
 
- //   private LocalDate postedDate;
+    private String postedDate;
 
     private String experienceRequired;
 
@@ -31,8 +33,6 @@ public class JobListViewTypeDTO {
 
     private byte[] image;
 
-  //  private Boolean isPromoted;
-
     public JobListViewTypeDTO() {}
 
     public JobListViewTypeDTO(Job job) {
@@ -40,7 +40,7 @@ public class JobListViewTypeDTO {
         this.title = job.getTitle();
         this.location = job.getLocation();
         this.type = job.getType();
-       // this.postedDate = job.getPostDate();
+        this.postedDate = FormatUtil.formatPostDateToString(job.getPostDate());
         this.experienceRequired = job.getExperienceRequired();
 
        // this.isPromoted = job.getPromotedUntil().compareTo(LocalDateTime.now()) > 0;

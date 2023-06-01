@@ -78,4 +78,11 @@ public class UserController {
 			return new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE);
 		}
 	}
+	
+	@GetMapping(value = "/hasCv")
+	public ResponseEntity<?> hasCv(@RequestHeader("Authorization") String authorizationHeader,
+			@RequestParam String email) {
+		boolean result = userService.hasCv(email);
+		return ResponseEntity.status(HttpStatus.OK).body(result);
+	}
 }
