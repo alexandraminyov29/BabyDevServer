@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.view.RedirectView;
 
 import com.babydev.app.domain.auth.AuthenticationRequest;
 import com.babydev.app.domain.auth.AuthenticationResponse;
@@ -53,9 +54,10 @@ public class AuthenticationController {
 		}
 	}
 	
-    @GetMapping("/confirm")
-    public String confirm(@RequestParam("link") String token) {
-        return service.confirmToken(token);
+	@GetMapping("/confirm")
+    public RedirectView confirm(@RequestParam("link") String token) {
+        service.confirmToken(token);
+        return new RedirectView("http://localhost:8081/login?activated=true");
     }
 	
 	@PostMapping("/authenticate")
@@ -73,6 +75,8 @@ public class AuthenticationController {
 			return AdviceController.handleWrongPassword(e);
 		} catch (EmptyFieldException e) {
 			return AdviceController.handleEmptyFieldException(e);
+		} catch (RegistrationTokenNotValidException e) {
+			return AdviceController.handleRegistrationTokenIsNotValid(e);
 		}
 		
 	}

@@ -13,18 +13,18 @@ import org.springframework.web.multipart.MultipartFile;
 @Service
 public class FileStorageService {
 
-    private String fileStorageLocation = "D:/babydev/files/cv";
+	private String fileStorageLocation = "files/cv";
 
     public String storeFile(MultipartFile file) throws Exception {
         String fileName = UUID.randomUUID().toString() + "-" + file.getOriginalFilename();
 
         try {
-            Path targetLocation = Paths.get(fileStorageLocation).resolve(fileName);
+            Path targetLocation = Paths.get(System.getProperty("user.dir"), fileStorageLocation).resolve(fileName);
             Files.copy(file.getInputStream(), targetLocation, StandardCopyOption.REPLACE_EXISTING);
 
             return fileName;
         } catch (IOException e) {
-        	e.printStackTrace();
+            e.printStackTrace();
             throw new Exception("Failed to store file " + fileName, e);
         }
     }
