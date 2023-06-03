@@ -1,11 +1,10 @@
 package com.babydev.app.service.facade;
 
-import java.io.IOException;
-
-import org.springframework.lang.NonNull;
-
 import com.babydev.app.domain.entity.User;
 import com.babydev.app.exception.NotAuthorizedException;
+import org.springframework.lang.NonNull;
+
+import java.io.IOException;
 
 public interface UserServiceFacade {
 	public void deleteUserById(@NonNull String authorizationHeader, @NonNull long id) throws NotAuthorizedException;
@@ -14,6 +13,6 @@ public interface UserServiceFacade {
 	
 	void uploadImage(@NonNull String authorizationHeader, byte[] array) throws IOException;
 	
-	void updatePhoneNumber(String authorizationHeader, String phoneNumber);
+	String updatePhoneNumber(String authorizationHeader, String phoneNumber);
 
 }

@@ -53,10 +53,10 @@ public class UserController {
 	}
 	
 	@PatchMapping(value = "/phoneno")
-	public ResponseEntity<?> updatePhoneNumber(@RequestHeader("Authorization") String authorizationHeader,
-			@RequestBody String newPhoneNumber) {
+	public ResponseEntity<?> updatePhoneNumber(@RequestHeader(value = "Authorization") String authorizationHeader,
+			@RequestParam String newPhoneNumber) {
 		userService.updatePhoneNumber(authorizationHeader, newPhoneNumber);
-		return new ResponseEntity<>(HttpStatus.OK);
+		return ResponseEntity.status(HttpStatus.OK).body(userService.updatePhoneNumber(authorizationHeader, newPhoneNumber));
 	}
 	@GetMapping("/favorite")
 	public ResponseEntity<?> getUserFavorites(@RequestHeader(value = "Authorization") String authorizationHeader) {

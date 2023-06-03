@@ -38,7 +38,7 @@ public class JobController {
     }
 
     @GetMapping("/all")
-    public ResponseEntity<List<JobListViewTypeDTO>> getJobs() {
+    public ResponseEntity<List<JobListViewTypeDTO>> getJobs(@RequestHeader(value = "Authorization") String authorizationHeader) {
         return ResponseEntity.status(HttpStatus.OK).body(jobService.getAllJobs());
     }
 
@@ -51,10 +51,10 @@ public class JobController {
     @PostMapping("/apply")
     public ResponseEntity<?> applyToJob(@RequestHeader(value = "Authorization") String authorizationHeader, @RequestParam(value = "jobId") Long jobId) {
         try {
-             jobService.applyJob(authorizationHeader, jobId);
-             return ResponseEntity.status(HttpStatus.OK).body("Applied to job, good luck!");
+            jobService.applyJob(authorizationHeader, jobId);
+            return ResponseEntity.status(HttpStatus.OK).body("Applied to job, good luck!");
         } catch (EntityNotFoundException e) {
-                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }
     }
 
@@ -76,6 +76,16 @@ public class JobController {
     public ResponseEntity<List<JobListViewTypeDTO>> getJobsByLocation(@RequestParam String location) {
         try {
             List<JobListViewTypeDTO> filteredJobs = jobService.getJobsByLocation(location);
+            return ResponseEntity.status(HttpStatus.OK).body(filteredJobs);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
+    }
+
+    @GetMapping("/jobType")
+    public ResponseEntity<List<JobListViewTypeDTO>> getJobsByType(@RequestParam String jobType) {
+        try {
+            List<JobListViewTypeDTO> filteredJobs = jobService.getJobsByType(jobType);
             return ResponseEntity.status(HttpStatus.OK).body(filteredJobs);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);

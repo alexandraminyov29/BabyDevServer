@@ -3,6 +3,7 @@ package com.babydev.app.service.impl;
 import com.babydev.app.domain.dto.JobListViewTypeDTO;
 import com.babydev.app.domain.dto.JobPageDTO;
 import com.babydev.app.domain.entity.Job;
+import com.babydev.app.domain.entity.JobType;
 import com.babydev.app.domain.entity.Location;
 import com.babydev.app.domain.entity.User;
 import com.babydev.app.repository.CompanyRepository;
@@ -16,9 +17,14 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -32,6 +38,16 @@ public class JobService implements JobServiceFacade {
     private final JwtService jwtService;
 
     public List<Job> getJobs() {
+//         = null;
+
+        try {
+            Process process = Runtime.getRuntime().exec("python3 /files/scripts/helloWorld.py");
+            BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+            String scriptOutput = reader.readLine();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
         return jobRepository.findAll();
     }
 
@@ -91,7 +107,20 @@ public class JobService implements JobServiceFacade {
         List<JobListViewTypeDTO> jobs = getAllJobs();
 
         List<JobListViewTypeDTO> filteredJobs = jobs.stream()
-                .filter(job -> job.getLocation() == Location.valueOf(location))
+                .filter(j -> j.getLocation() == Location.valueOf(location))
+                .collect(Collectors.toList());
+        if(filteredJobs.isEmpty()) {
+            throw new IllegalArgumentException("Couldn't find job");
+        } else {
+            return filteredJobs;
+        }
+    }
+
+    public List<JobListViewTypeDTO> getJobsByType(String jobType) {
+        List<JobListViewTypeDTO> jobs = getAllJobs();
+
+        List<JobListViewTypeDTO> filteredJobs = jobs.stream()
+                .filter(j -> j.getType() == JobType.valueOf(jobType))
                 .collect(Collectors.toList());
         if(filteredJobs.isEmpty()) {
             throw new IllegalArgumentException("Couldn't find job");

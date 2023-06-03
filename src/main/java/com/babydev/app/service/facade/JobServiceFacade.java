@@ -26,7 +26,7 @@ public interface JobServiceFacade {
 
     public List<JobListViewTypeDTO> getJobsByLocation(String location);
 
- //   public List<JobListViewTypeDTO> searchJobs(String keyword);
+    public List<JobListViewTypeDTO> getJobsByType(String jobType);
 
     public void applyJob(String token, Long jobId);
 
