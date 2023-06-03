@@ -13,12 +13,14 @@ import org.springframework.stereotype.Service;
 import com.babydev.app.domain.dto.qualifications.EducationDTO;
 import com.babydev.app.domain.dto.qualifications.ExperienceDTO;
 import com.babydev.app.domain.dto.qualifications.SkillDTO;
+import com.babydev.app.domain.dto.qualifications.UserSkillsDTO;
 import com.babydev.app.domain.entity.Degree;
 import com.babydev.app.domain.entity.Education;
 import com.babydev.app.domain.entity.Experience;
 import com.babydev.app.domain.entity.Skill;
 import com.babydev.app.domain.entity.User;
 import com.babydev.app.exception.NotAuthorizedException;
+import com.babydev.app.helper.FormatUtil;
 import com.babydev.app.helper.Permissions;
 import com.babydev.app.repository.qualifications.EducationRepository;
 import com.babydev.app.repository.qualifications.ExperienceRepository;
@@ -71,7 +73,7 @@ public class QualificationsService {
 		User user = userService.getUserFromToken(authorizationHeader);
 		
 		Skill newSkill = Skill.builder()
-				.skillName(skill.getSkillName())
+				.skillName(FormatUtil.getSkillFromEnumValue(skill.getSkillName()))
 				.skillExperience(skill.getSkillExperience())
 				.user(user)
 				.build();
@@ -117,11 +119,11 @@ public class QualificationsService {
 		return mapEducationListToDTO(user.getEducation());
 	}
 	
-	public List<SkillDTO> getSkillsForUser(
+	public UserSkillsDTO getSkillsForUser(
 			String authorizationHeader, String email) throws NotAuthorizedException {
 		
 		User user = getUserBasedOnAuthority(authorizationHeader, email);
-		return mapSkillListToDTO(user.getSkills());
+		return new UserSkillsDTO(mapSkillListToDTO(user.getSkills()));
 	}
 	
 	public List<ExperienceDTO> getExperienceForUser(
@@ -178,7 +180,7 @@ public class QualificationsService {
         
         Skill updatedSkill = skillRepository.findById(skillDTO.getId()).get();
         
-        updatedSkill.setSkillName(skillDTO.getSkillName());
+        updatedSkill.setSkillName(FormatUtil.getSkillFromEnumValue(skillDTO.getSkillName()));
         updatedSkill.setSkillExperience(skillDTO.getSkillExperience());
         
         skillRepository.save(updatedSkill);
@@ -201,7 +203,7 @@ public class QualificationsService {
 		Skill newSkill;
 		for (SkillDTO skill: newSkills) {
 			newSkill = Skill.builder()
-					.skillName(skill.getSkillName())
+					.skillName(FormatUtil.getSkillFromEnumValue(skill.getSkillName()))
 					.skillExperience(skill.getSkillExperience())
 					.user(user)
 					.build();
@@ -312,7 +314,7 @@ public class QualificationsService {
         
 		return SkillDTO.builder()
 				.id(skill.getSkillId())
-				.skillName(skill.getSkillName())
+				.skillName(skill.getSkillName().getDisplayName())
 				.skillExperience(skill.getSkillExperience())
 				.build();
 	}

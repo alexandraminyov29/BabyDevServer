@@ -4,6 +4,8 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 
+import com.babydev.app.domain.entity.DevelopmentSkill;
+
 public class FormatUtil {
 	
 	// used for jobs
@@ -34,4 +36,13 @@ public class FormatUtil {
             return date.format(DateTimeFormatter.ofPattern("dd-MM-yyyy"));
         }
     }
+	
+	public static DevelopmentSkill getSkillFromEnumValue(String value) {
+	    for (DevelopmentSkill skill : DevelopmentSkill.values()) {
+	        if (skill.getDisplayName().equalsIgnoreCase(value)) {
+	            return skill;
+	        }
+	    }
+	    return null; 
+	}
 }

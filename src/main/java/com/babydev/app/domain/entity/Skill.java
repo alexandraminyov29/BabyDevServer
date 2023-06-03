@@ -33,7 +33,8 @@ public class Skill {
     private Long skillId;
 
     @Column(name = "skill_name")
-    private String skillName;
+    @Enumerated(EnumType.STRING)
+    private DevelopmentSkill skillName;
 
     @Column(name = "skill_experience")
     @Enumerated(EnumType.ORDINAL)
