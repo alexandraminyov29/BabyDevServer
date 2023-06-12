@@ -81,6 +81,7 @@ public class UserService implements UserServiceFacade {
 				.lastName(user.getLastName())
 				.email(user.getEmail())
 				.phoneNumber(user.getPhoneNumber())
+				.location(user.getLocation())
 				.imageData(ImageUtil.decompressImage(user.getImageData()))
 				.build();
 	}

@@ -42,6 +42,17 @@ public class JobController {
         return ResponseEntity.status(HttpStatus.OK).body(jobService.getAllJobs());
     }
 
+    @GetMapping("/favorites")
+    public ResponseEntity<List<JobListViewTypeDTO>> getFavoriteJobs(@RequestHeader(value = "Authorization") String authorizationHeader) {
+        return ResponseEntity.status(HttpStatus.OK).body(jobService.getFavoriteJobs(authorizationHeader));
+    }
+
+    @GetMapping("/recommend")
+    public ResponseEntity<List<JobListViewTypeDTO>> recommendJobs(@RequestHeader(value = "Authorization") String authorizationHeader) {
+            return ResponseEntity.status(HttpStatus.OK).body(jobService.sortByScore(authorizationHeader));
+
+    }
+
     @GetMapping("/search")
     public ResponseEntity<List<JobListViewTypeDTO>> searchJobs(@RequestHeader(value = "Authorization") String authorizationHeader,
                                                                @RequestParam String keyword) {
@@ -55,6 +66,8 @@ public class JobController {
             return ResponseEntity.status(HttpStatus.OK).body("Applied to job, good luck!");
         } catch (EntityNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
         }
     }
 

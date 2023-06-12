@@ -2,10 +2,7 @@ package com.babydev.app.service.impl;
 
 import com.babydev.app.domain.dto.JobListViewTypeDTO;
 import com.babydev.app.domain.dto.JobPageDTO;
-import com.babydev.app.domain.entity.Job;
-import com.babydev.app.domain.entity.JobType;
-import com.babydev.app.domain.entity.Location;
-import com.babydev.app.domain.entity.User;
+import com.babydev.app.domain.entity.*;
 import com.babydev.app.repository.CompanyRepository;
 import com.babydev.app.repository.JobRepository;
 import com.babydev.app.repository.UserRepository;
@@ -23,8 +20,10 @@ import java.io.InputStreamReader;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 @Service
@@ -40,17 +39,159 @@ public class JobService implements JobServiceFacade {
     public List<Job> getJobs() {
 //         = null;
 
-        try {
-            Process process = Runtime.getRuntime().exec("python3 /files/scripts/helloWorld.py");
-            BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-            String scriptOutput = reader.readLine();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+
 
         return jobRepository.findAll();
     }
 
+    public List<String> findSkillInJobDescription(String inputText) throws IOException, InterruptedException {
+        String scriptPath = "files/scripts/skillScript.py";
+
+        ProcessBuilder processBuilder = new ProcessBuilder("python3", scriptPath, inputText);
+        processBuilder.redirectErrorStream(true);
+
+        List<String> output = new ArrayList<>()  {};
+
+        try {
+            Process process = processBuilder.start();
+            BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+            String line;
+            while ((line = reader.readLine()) != null) {
+                output.add(line);
+            }
+            return output;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return output;
+    }
+    public List<String> findLocationInJobDescription(String input_text) throws IOException, InterruptedException {
+        String scriptPath = "files/scripts/helloWorld.py";
+
+        ProcessBuilder processBuilder = new ProcessBuilder("python3", scriptPath, input_text);
+        processBuilder.redirectErrorStream(true);
+
+        List<String> output = new ArrayList<>()  {};
+
+        try {
+            Process process = processBuilder.start();
+            BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+            String line;
+            while ((line = reader.readLine()) != null) {
+                output.add(line);
+            }
+            return output;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return output;
+    }
+
+    public int matchLocation(User user, Job job ) {
+        try {
+
+            List<String> jobLocation = findLocationInJobDescription(job.getDescription());
+
+
+            String userLocation = user.getLocation().toString();
+            userLocation = userLocation.trim().toLowerCase();
+
+            for (String jobLoc : jobLocation) {
+                jobLoc = jobLoc.trim().toLowerCase();
+
+                if (jobLoc.contains(userLocation)) {
+                    return 1;
+                }
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        catch (InterruptedException exception) {
+            throw new RuntimeException(exception);
+        }
+        return 0;
+    }
+
+    public int matchSkills(User user, Job job) {
+        int score = 0;
+
+        try {
+
+            List<String> jobSkill = findSkillInJobDescription(job.getDescription());
+
+
+
+            for (Skill skill : user.getSkills()) {
+                for (String skillRequired : jobSkill) {
+                    if (skill.getSkillName().toString().equalsIgnoreCase(skillRequired)) {
+                        score += skill.getSkillExperience().ordinal() + 1;
+                    }
+                }
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        catch (InterruptedException exception) {
+            throw new RuntimeException(exception);
+        }
+        return score;
+    }
+
+    public CompletableFuture<Integer> calculateScore(User user, Job job) {
+        CompletableFuture<Integer> locationScoreFuture = CompletableFuture.supplyAsync(() -> matchLocation(user, job) * 5);
+        CompletableFuture<Integer> skillScoreFuture = CompletableFuture.supplyAsync(() -> matchSkills(user, job));
+
+        return locationScoreFuture.thenCombine(skillScoreFuture, Integer::sum);
+    }
+
+    public List<JobListViewTypeDTO> sortByScore(String token) {
+        List<Job> jobs = jobRepository.findAll();
+        Long userId = jwtService.extractUserIdFromToken(token);
+        Optional<User> user = userRepository.findById(userId);
+        List <JobListViewTypeDTO> jobsResult = new ArrayList<>();
+
+        for (Job job : jobs) {
+            final JobListViewTypeDTO newJob = mapJobToDTO(job);
+            CompletableFuture<Integer> newScore = calculateScore(user.get(), job);
+
+            newScore.thenAccept( score -> {
+                newJob.setScore(score);
+                jobsResult.add(newJob);
+            }).join();
+        }
+
+        return jobsResult.stream()
+                .sorted(Comparator.comparingInt(JobListViewTypeDTO::getScore).reversed())
+                .collect(Collectors.toList());
+    }
+
+    private JobListViewTypeDTO mapJobToDTO(Job job) {
+        final Company company = job.getCompany();
+        return JobListViewTypeDTO.builder()
+                .id(job.getJobId())
+                .title(job.getTitle())
+                .location(job.getLocation())
+                .type(job.getType())
+                .experienceRequired(job.getExperienceRequired())
+                .companyId(company.getCompanyId())
+                .name(company.getName())
+                .image(company.getImage()).
+                build();
+    }
+
+    public List<JobListViewTypeDTO> getFavoriteJobs(String token) {
+        Long userId = jwtService.extractUserIdFromToken(token);
+        User user = userRepository.findById(userId).get();
+        List<Job> favoriteJobs = user.getFavoriteJobs();
+        List <JobListViewTypeDTO> jobResult = new ArrayList<>();
+        for (Job job : favoriteJobs) {
+            mapJobToDTO(job);
+            jobResult.add(mapJobToDTO(job));
+        }
+        return jobResult;
+    }
     public Job getJobById(Long id) {
         return jobRepository.findById(id).get();
     }
@@ -60,6 +201,7 @@ public class JobService implements JobServiceFacade {
         job.setCompany(companyRepository.findCompanyByCompanyId(companyId).get());
         job.setPromotedUntil(LocalDateTime.of(1970, 12, 12, 10, 0));
         job.setPostDate(LocalDate.now());
+       // job.setRequiredSkill();
         return jobRepository.save(job);
     }
 
@@ -139,7 +281,7 @@ public class JobService implements JobServiceFacade {
         return jobsDTO;
     }
 
-    public void applyJob(String token, Long jobId) {
+    public void applyJob(String token, Long jobId) throws RuntimeException{
         Optional<Job> job = jobRepository.findById(jobId);
         if(job.isEmpty()) {
             throw new EntityNotFoundException("Couldn't find job");
@@ -149,8 +291,20 @@ public class JobService implements JobServiceFacade {
         if(user.isEmpty()) {
             throw new EntityNotFoundException("Couldn't find user");
         }
+
+        List<User> applicants = job.get().getApplicants();
+
+        // Check if user already applied to the given job
+        for (User applicant : applicants) {
+            if (applicant.getUserId() == userId) {
+                throw new RuntimeException("You've already applied!");
+            }
+
+        }
+
         job.get().getApplicants().add(user.get());
         jobRepository.save(job.get());
+
     }
 
     @Transactional
