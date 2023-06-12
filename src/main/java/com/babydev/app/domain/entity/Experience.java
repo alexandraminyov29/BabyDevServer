@@ -51,5 +51,5 @@ public class Experience {
     @JoinColumn(referencedColumnName = "id", name = "user_id")
     private User user;
     
-    Experience(){};
+    public Experience(){};
 }

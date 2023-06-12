@@ -1,0 +1,81 @@
+body {
+	font-family: "Segoe UI", Arial, sans-serif;
+	background-color: rgb(210, 210, 255);
+	margin-top:40px;
+	margin-left:40px;
+}
+
+.container {
+	display: table;
+	width: 100%;
+}
+
+.left {
+	display: table-cell;
+	vertical-align: top;
+	padding-right: 20px;
+}
+
+.right {
+	display: table-cell;
+	vertical-align: top;
+}
+
+.section {
+	margin-bottom: 50px;
+}
+
+.item {
+	margin-bottom: 10px;
+}
+
+.title {
+	font-weight: bold;
+	font-style: italic;
+	margin: 0;
+}
+
+.tabel,
+.content {
+
+	margin-left: 15px;
+	margin-top: 0;
+	margin-right: 0;
+	margin-bottom: 0;
+}
+
+ul {
+	margin-left: 15px;
+	padding: 0;
+	list-style: none;
+}
+
+.page-footer {
+	text-align: right;
+	font-style: italic;
+	margin-top: 20px;
+}
+
+.section h2 {
+	margin-top: 0;
+}
+
+.profile-picture {
+	width: 200px;
+	height: auto;
+}
+
+.container:after {
+	content: "";
+	display: table;
+	clear: both;
+}
+
+.skillName {
+	padding-right:20px;
+}
+
+.skillExperience {
+	font-style: italic;
+}
+

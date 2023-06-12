@@ -2,4 +2,16 @@
 *.class
 
 # Ignore target directory
-target/*
+/target/
+
+# Ignore generated files by IDEs
+.idea/
+.vscode/
+
+# Ignore generated build files
+build/
+bin/
+
+# Ignore generated dependency directories
+lib/
+libs/

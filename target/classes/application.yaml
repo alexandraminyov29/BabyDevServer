@@ -28,6 +28,10 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.MySQL57Dialect
+  thymeleaf:
+    enabled: true
+    prefix: classpath:/templates/
+    suffix: .html
 #logging.level.org.springframework.web: DEBUG
 #logging.level.org.hibernate: DEBUG
 logging:

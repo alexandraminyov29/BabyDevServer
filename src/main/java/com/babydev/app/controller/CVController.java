@@ -8,9 +8,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -42,6 +40,38 @@ public class CVController {
         CurriculumVitae storedCV;
 		try {
 			storedCV = cvService.storeCV(authorizationHeader, file, email);
+			return ResponseEntity.ok("CV uploaded successfully. CV ID: " + storedCV.getId());
+		} catch (NotAuthorizedException e) {
+			return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED).body("METHOD NOT ALLOWED");
+		} catch (Exception e) {
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getLocalizedMessage());
+		}
+		
+    }
+    
+    @PostMapping("/read")
+    public ResponseEntity<String> readCV(@RequestHeader("Authorization") String authorizationHeader, 
+    		@RequestParam("file") MultipartFile file,
+    		@RequestParam("email") String email) {
+    	
+		try {
+			cvService.extractDataFromEuropassPdf(authorizationHeader, email, file);
+			return ResponseEntity.ok("CV read ");
+		} catch (NotAuthorizedException e) {
+			return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED).body("METHOD NOT ALLOWED");
+		} catch (Exception e) {
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getLocalizedMessage());
+		}
+		
+    }
+    
+    @PostMapping("/generate")
+    public ResponseEntity<String> generateCV(@RequestHeader("Authorization") String authorizationHeader,
+    		@RequestParam("email") String email) {
+    	
+        CurriculumVitae storedCV;
+		try {
+			storedCV = cvService.generateCV(authorizationHeader, email);
 			return ResponseEntity.ok("CV uploaded successfully. CV ID: " + storedCV.getId());
 		} catch (NotAuthorizedException e) {
 			return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED).body("METHOD NOT ALLOWED");
@@ -84,20 +114,6 @@ public class CVController {
 			return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED).body("METHOD NOT ALLOWED");
 		}
         
-    }
-
-    @PutMapping("/{userId}")
-    public ResponseEntity<String> updateCV(@PathVariable Long userId,
-                                           @RequestParam("file") MultipartFile file) {
-    	CurriculumVitae updatedCV;
-		try {
-			updatedCV = cvService.updateCV(userId, file);
-	        return ResponseEntity.ok("CV updated successfully. CV ID: " + updatedCV.getId());
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		return ResponseEntity.notFound().build();
     }
 }
 

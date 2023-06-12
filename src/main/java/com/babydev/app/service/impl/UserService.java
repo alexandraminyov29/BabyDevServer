@@ -1,19 +1,27 @@
 package com.babydev.app.service.impl;
 
+import java.io.IOException;
+import java.util.Comparator;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 import com.babydev.app.domain.dto.PersonalInformationDTO;
+import com.babydev.app.domain.dto.UserInfoDTO;
+import com.babydev.app.domain.entity.Education;
+import com.babydev.app.domain.entity.Experience;
 import com.babydev.app.domain.entity.Job;
+import com.babydev.app.domain.entity.Skill;
 import com.babydev.app.domain.entity.User;
 import com.babydev.app.exception.NotAuthorizedException;
+import com.babydev.app.helper.FormatUtil;
 import com.babydev.app.helper.ImageUtil;
 import com.babydev.app.helper.Permissions;
 import com.babydev.app.repository.UserRepository;
 import com.babydev.app.security.config.JwtService;
 import com.babydev.app.service.facade.UserServiceFacade;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import java.io.IOException;
-import java.util.List;
 
 @Service
 public class UserService implements UserServiceFacade {
@@ -83,6 +91,33 @@ public class UserService implements UserServiceFacade {
 				.phoneNumber(user.getPhoneNumber())
 				.location(user.getLocation())
 				.imageData(ImageUtil.decompressImage(user.getImageData()))
+				.build();
+	}
+	
+	// Used for resume generation
+	public UserInfoDTO getUserInfo(User user) {
+		return UserInfoDTO.builder()
+				// personal information
+				.firstName(user.getFirstName())
+				.lastName(user.getLastName())
+				.email(user.getEmail())
+				.phoneNumber(user.getPhoneNumber())
+				.imageData(ImageUtil.decompressImage(user.getImageData()))
+				// education
+				.education(user.getEducation().stream()
+				        .sorted(Comparator.comparing(Education::getDateTo, Comparator.nullsFirst(Comparator.reverseOrder())))
+				        .map(FormatUtil::mapEducationToDTO)
+				        .collect(Collectors.toList()))
+				// experience
+				.experience(user.getExperience().stream()
+				        .sorted(Comparator.comparing(Experience::getDateTo, Comparator.nullsFirst(Comparator.reverseOrder())))
+				        .map(FormatUtil::mapExperienceToDTO)
+				        .collect(Collectors.toList()))
+				// skills
+				.skill(user.getSkills().stream()
+						.sorted(Comparator.comparing(Skill::getSkillExperience).reversed())
+						.map(FormatUtil::mapSkillToDTOForCv)
+						.collect(Collectors.toList()))
 				.build();
 	}
 
