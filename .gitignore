@@ -14,5 +14,3 @@ build/
 # Ignore generated dependency directories
 lib/
 libs/
-
-/src/**
