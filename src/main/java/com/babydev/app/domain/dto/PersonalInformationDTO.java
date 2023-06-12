@@ -1,5 +1,6 @@
 package com.babydev.app.domain.dto;
 
+import com.babydev.app.domain.entity.Location;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -12,5 +13,6 @@ public class PersonalInformationDTO {
 	private String lastName;
 	private String email;
 	private String phoneNumber;
+	private Location location;
 	private byte[] imageData;
 }

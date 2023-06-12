@@ -5,12 +5,12 @@ import com.babydev.app.domain.entity.Job;
 import com.babydev.app.domain.entity.JobType;
 import com.babydev.app.domain.entity.Location;
 import com.babydev.app.helper.FormatUtil;
-
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 @Getter
 @Setter
+@Builder
+@AllArgsConstructor
 public class JobListViewTypeDTO {
 
     private Long id;
@@ -32,6 +32,8 @@ public class JobListViewTypeDTO {
     private String name;
 
     private byte[] image;
+
+    private int score;
 
     public JobListViewTypeDTO() {}
 

@@ -1,6 +1,7 @@
 package com.babydev.app.domain.entity;
 
 public enum DevelopmentSkill {
+    MAVEN("Maven"),
     PYTHON("Python"),
     JAVASCRIPT("JavaScript"),
     JAVA("Java"),

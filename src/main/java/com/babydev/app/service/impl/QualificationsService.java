@@ -1,32 +1,25 @@
 package com.babydev.app.service.impl;
 
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.Iterator;
-import java.util.List;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import com.babydev.app.domain.dto.qualifications.EducationDTO;
 import com.babydev.app.domain.dto.qualifications.ExperienceDTO;
 import com.babydev.app.domain.dto.qualifications.SkillDTO;
 import com.babydev.app.domain.dto.qualifications.UserSkillsDTO;
-import com.babydev.app.domain.entity.Degree;
-import com.babydev.app.domain.entity.Education;
-import com.babydev.app.domain.entity.Experience;
-import com.babydev.app.domain.entity.Skill;
-import com.babydev.app.domain.entity.User;
+import com.babydev.app.domain.entity.*;
 import com.babydev.app.exception.NotAuthorizedException;
 import com.babydev.app.helper.FormatUtil;
 import com.babydev.app.helper.Permissions;
+import com.babydev.app.repository.JobRepository;
 import com.babydev.app.repository.qualifications.EducationRepository;
 import com.babydev.app.repository.qualifications.ExperienceRepository;
 import com.babydev.app.repository.qualifications.SkillRepository;
-
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
 
 @Service
 public class QualificationsService {
@@ -41,6 +34,8 @@ public class QualificationsService {
 	ExperienceRepository experienceRepository;
 	@Autowired
 	EducationRepository educationRepository;
+	@Autowired
+	JobRepository jobRepository;
 	
 	public EducationDTO addEducation(String authorizationHeader, EducationDTO education) {
 		User user = userService.getUserFromToken(authorizationHeader);
@@ -81,6 +76,26 @@ public class QualificationsService {
 		user.getSkills().add(newSkill);
 		userService.save(user);
 		
+		return skill;
+	}
+    @Transactional
+	public SkillDTO addSkillToJob(long jobId, SkillDTO skill) {
+
+		Optional<Job> job = jobRepository.findById(jobId);
+		if(job.isEmpty()) {
+			throw new EntityNotFoundException("Couldn't find job");
+		}
+
+		Skill newSkill = Skill.builder()
+				.skillName(FormatUtil.getSkillFromEnumValue(skill.getSkillName()))
+				.skillExperience(skill.getSkillExperience())
+				.job(job.get())
+				.build();
+
+		skillRepository.save(newSkill);
+		job.get().getRequiredSkill().add(newSkill);
+		jobRepository.save(job.get());
+
 		return skill;
 	}
 
