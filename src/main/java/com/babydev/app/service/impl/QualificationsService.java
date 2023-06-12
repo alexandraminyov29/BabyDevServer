@@ -272,31 +272,12 @@ public class QualificationsService {
 						Comparator.nullsFirst(Comparator.reverseOrder())))
 				.toList()
 				) {
-			result.add(mapEducationToDTO(e));
+			result.add(FormatUtil.mapEducationToDTO(e));
 		}
 		return result;
 	}
 	
-	private EducationDTO mapEducationToDTO (Education education) {
-		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
-        
-        String dateFrom = education.getDateFrom().format(formatter);
-        String dateTo;
-        if (education.getDateTo() != null) {
-        	dateTo = education.getDateTo().format(formatter);
-        } else {
-        	dateTo = "actual";
-        }
-        
-		return EducationDTO.builder()
-				.id(education.getEducationId())
-				.institution(education.getInstitution())
-				.subject(education.getSubject())
-				.dateFrom(dateFrom)
-				.dateTo(dateTo)
-				.degree(education.getDegree().toString())
-				.build();
-	}
+	
 	
 	private List<SkillDTO> mapSkillListToDTO (List<Skill> elements) {
 		List<SkillDTO> result = new ArrayList<SkillDTO>();
@@ -305,19 +286,12 @@ public class QualificationsService {
 				.sorted(Comparator.comparing(Skill::getSkillExperience).reversed())
 				.toList()
 				) {
-			result.add(mapSkillToDTO(e));
+			result.add(FormatUtil.mapSkillToDTO(e));
 		}
 		return result;
 	}
 	
-	private SkillDTO mapSkillToDTO (Skill skill) {
-        
-		return SkillDTO.builder()
-				.id(skill.getSkillId())
-				.skillName(skill.getSkillName().getDisplayName())
-				.skillExperience(skill.getSkillExperience())
-				.build();
-	}
+
 	
 	private List<ExperienceDTO> mapExperienceListToDTO (List<Experience> elements) {
 		List<ExperienceDTO> result = new ArrayList<ExperienceDTO>();
@@ -327,31 +301,24 @@ public class QualificationsService {
 						Comparator.nullsFirst(Comparator.reverseOrder())))
 				.toList()
 				) {
-			result.add(mapEducationToDTO(e));
+			result.add(FormatUtil.mapExperienceToDTO(e));
 		}
 		return result;
 	}
 	
-	private ExperienceDTO mapEducationToDTO (Experience experience) {
-		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
-        
-        String dateFrom = experience.getDateFrom().format(formatter);
-        String dateTo;
-        if (experience.getDateTo() != null) {
-        	dateTo = experience.getDateTo().format(formatter);
-        } else {
-        	dateTo = "actual";
-        }
-        
-		return ExperienceDTO.builder()
-				.id(experience.getExperienceId())
-				.title(experience.getTitle())
-				.companyName(experience.getCompanyName())
-				.position(experience.getPosition())
-				.dateFrom(dateFrom)
-				.dateTo(dateTo)
-				.build();
+	public void saveExperience(Experience e) {
+		experienceRepository.save(e);
 	}
+	
+	public void saveEducation(Education e) {
+		educationRepository.save(e);
+	}
+	
+	public void saveSkill(Skill s) {
+		skillRepository.save(s);
+	}
+	
+	
 
 
 }
