@@ -134,6 +134,6 @@ public class UserService implements UserServiceFacade {
     }
 
 	public boolean hasCv(String email) {
-		return getUserByEmail(email).isHasCv();
+		return getUserByEmail(email).getHasCv();
 	}
 }

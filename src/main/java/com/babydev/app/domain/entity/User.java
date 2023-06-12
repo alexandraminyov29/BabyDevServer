@@ -59,11 +59,11 @@ public class User implements UserDetails{
     private String phoneNumber;
     
     @Column(name = "is_active")
-    private boolean isActive;
+    private Boolean isActive;
     
     @Column(name = "has_cv")
     @Builder.Default
-    private boolean hasCv = false;
+    private Boolean hasCv = false;
     
     @Column(name = "user_role")
     @Enumerated(EnumType.STRING)
