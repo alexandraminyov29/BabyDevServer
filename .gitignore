@@ -10,8 +10,9 @@
 
 # Ignore generated build files
 build/
-bin/
 
 # Ignore generated dependency directories
 lib/
 libs/
+
+/src/**
