@@ -40,7 +40,7 @@ public class Permissions {
 	}
 	
 	public static boolean isActive(final User userToCheck) {
-		return userToCheck.isActive();
+		return userToCheck.getIsActive();
 	}
 	
 	/**

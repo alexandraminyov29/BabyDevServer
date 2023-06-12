@@ -84,7 +84,7 @@ public class EmailService {
 		}
 	}
 	
-	@Scheduled(cron = "0 58 22 * * ?")
+	@Scheduled(cron = "0 14 23 * * ?")
 	public void sendDailyOffersMail() {
 		try {
 			MimeMessage mimeMessage = noReplyMailSender.createMimeMessage();
