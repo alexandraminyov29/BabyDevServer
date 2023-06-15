@@ -1,20 +1,26 @@
 package com.babydev.app.service.impl;
 
 import java.io.IOException;
+import java.util.Base64;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.babydev.app.domain.dto.CompanyInfoDTO;
 import com.babydev.app.domain.dto.PersonalInformationDTO;
+import com.babydev.app.domain.dto.RecruiterRequest;
 import com.babydev.app.domain.dto.UserInfoDTO;
+import com.babydev.app.domain.entity.Company;
 import com.babydev.app.domain.entity.Education;
 import com.babydev.app.domain.entity.Experience;
 import com.babydev.app.domain.entity.Job;
 import com.babydev.app.domain.entity.Skill;
 import com.babydev.app.domain.entity.User;
+import com.babydev.app.domain.entity.UserRole;
 import com.babydev.app.exception.NotAuthorizedException;
 import com.babydev.app.helper.FormatUtil;
 import com.babydev.app.helper.ImageUtil;
@@ -23,6 +29,9 @@ import com.babydev.app.repository.UserRepository;
 import com.babydev.app.security.config.JwtService;
 import com.babydev.app.service.facade.UserServiceFacade;
 
+import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
+
 @Service
 public class UserService implements UserServiceFacade {
 	
@@ -30,6 +39,10 @@ public class UserService implements UserServiceFacade {
 	UserRepository userRepository;
 	@Autowired
 	JwtService jwtService;
+	@Autowired
+	CompanyService companyService;
+	@Autowired
+	PasswordEncoder passwordEncoder;
 
 	@Override
 	public User getUserByEmail(String email) {
@@ -54,7 +67,6 @@ public class UserService implements UserServiceFacade {
     public void uploadImage(String authorizationHeader, byte[] array) throws IOException {
         User user = getUserFromToken(authorizationHeader);
         user.setImageData(ImageUtil.compressImage(array));
-        
         save(user);
     }
 	
@@ -119,6 +131,40 @@ public class UserService implements UserServiceFacade {
 						.map(FormatUtil::mapSkillToDTOForCv)
 						.collect(Collectors.toList()))
 				.build();
+	}
+	
+	@Transactional
+	public RecruiterRequest requestRecruiterAccount(RecruiterRequest request) throws EntityNotFoundException {
+		
+		CompanyInfoDTO companyInfo = request.getCompany();
+		Company company;
+		
+		if (companyInfo.isExistent()) {
+			company = companyService.getCompanyByName(companyInfo.getName());
+		} else {
+			company = Company.builder()
+					.name(companyInfo.getName())
+					.image(ImageUtil.compressImage(Base64.getDecoder().decode(companyInfo.getImage())))
+					.webPage(companyInfo.getWebPage())
+					.build();
+		}
+		
+		User user = User.builder()
+	            .firstName(request.getFirstName())
+	            .lastName(request.getLastName())
+	            .email(request.getEmail())
+	            .phoneNumber(request.getPhoneNumber())
+	            .password(passwordEncoder.encode(request.getPassword()))
+	            .role(UserRole.RECRUITER)
+	            .company(company)
+	            .imageData(null)
+	            .build();
+		
+		userRepository.save(user);
+		company.getRecruiters().add(user);
+		companyService.save(company);
+		
+		return request;
 	}
 
 	public List<User> findAllActiveUsers() {

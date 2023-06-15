@@ -1,16 +1,28 @@
 package com.babydev.app.domain.entity;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import jakarta.persistence.*;
+
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Lob;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
-
-import java.util.List;
 
 @Entity
 @Table(name = "company")
 @Getter
 @Setter
+@Builder
 public class Company {
 
     @Id
@@ -25,14 +37,15 @@ public class Company {
     private String webPage;
 
     @Lob
-    @Column(name = "image")
+    @Column(name = "image", length = 2000)
     private byte[] image;
 
     @JsonIgnore
     @OneToMany(mappedBy = "company", cascade = CascadeType.ALL)
     private List<Job> job;
-
-
-
-
+    
+    @JsonIgnore
+    @OneToMany(mappedBy = "company", cascade = CascadeType.ALL)
+    @Builder.Default
+    private List<User> recruiters = new ArrayList<User>();
 }

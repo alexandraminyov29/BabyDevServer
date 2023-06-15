@@ -86,6 +86,11 @@ public class User implements UserDetails{
     @JsonIgnore
 	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
 	private List<Education> education;
+    
+    @JsonIgnore
+    @ManyToOne
+    @JoinColumn(referencedColumnName = "id", name = "company_id")
+    private Company company;
 
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {

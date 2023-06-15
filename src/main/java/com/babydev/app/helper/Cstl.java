@@ -23,7 +23,7 @@ public class Cstl {
 			'u', 'v', 'w', 'x', 'y', 'z', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O',
 			'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '-');
 
-	public static String[] allowedEndpoints = { "/api/auth/**", "api/users/favorite",
+	public static String[] allowedEndpoints = { "/api/auth/**", "/api/users/recruiters/request", "api/users/favorite",
 			// JobController
 			"/api/jobs/all", "/api/jobs/search" };
 
