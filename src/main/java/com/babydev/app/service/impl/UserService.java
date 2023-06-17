@@ -1,28 +1,7 @@
 package com.babydev.app.service.impl;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Base64;
-import java.util.Comparator;
-import java.util.List;
-import java.util.stream.Collectors;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Service;
-
-import com.babydev.app.domain.dto.CompanyInfoDTO;
-import com.babydev.app.domain.dto.PersonalInformationDTO;
-import com.babydev.app.domain.dto.RecruiterRequest;
-import com.babydev.app.domain.dto.RecruiterRequestListViewType;
-import com.babydev.app.domain.dto.UserInfoDTO;
-import com.babydev.app.domain.entity.Company;
-import com.babydev.app.domain.entity.Education;
-import com.babydev.app.domain.entity.Experience;
-import com.babydev.app.domain.entity.Job;
-import com.babydev.app.domain.entity.Skill;
-import com.babydev.app.domain.entity.User;
-import com.babydev.app.domain.entity.UserRole;
+import com.babydev.app.domain.dto.*;
+import com.babydev.app.domain.entity.*;
 import com.babydev.app.exception.NotAuthorizedException;
 import com.babydev.app.helper.FormatUtil;
 import com.babydev.app.helper.ImageUtil;
@@ -30,9 +9,15 @@ import com.babydev.app.helper.Permissions;
 import com.babydev.app.repository.UserRepository;
 import com.babydev.app.security.config.JwtService;
 import com.babydev.app.service.facade.UserServiceFacade;
-
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+
+import java.io.IOException;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class UserService implements UserServiceFacade {
@@ -261,5 +246,9 @@ public class UserService implements UserServiceFacade {
 		if (isLastRecruiter) {
 			companyService.deleteCompany(company.getCompanyId());
 		}
+	}
+
+	public Optional<User> findById(Long id) {
+		return userRepository.findById(id);
 	}
 }

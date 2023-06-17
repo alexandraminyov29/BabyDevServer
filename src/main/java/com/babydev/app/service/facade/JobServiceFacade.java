@@ -24,9 +24,9 @@ public interface JobServiceFacade {
 
    // public List<JobListViewTypeDTO> sortDescJobsByDateOfPosting(List<JobListViewTypeDTO> jobs);
 
-    public List<JobListViewTypeDTO> getJobsByLocation(String location);
+    public List<JobListViewTypeDTO> getJobsByLocation(String token, String location);
 
-    public List<JobListViewTypeDTO> getJobsByType(String jobType);
+    public List<JobListViewTypeDTO> getJobsByType(String token, String jobType);
 
     public void applyJob(String token, Long jobId);
 

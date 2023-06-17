@@ -2,7 +2,7 @@ package com.babydev.app.controller;
 
 import com.babydev.app.domain.dto.JobListViewTypeDTO;
 import com.babydev.app.domain.dto.JobPageDTO;
-import com.babydev.app.domain.entity.Job;
+import com.babydev.app.exception.NotAuthorizedException;
 import com.babydev.app.service.impl.JobService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -21,11 +21,6 @@ public class JobController {
     @Autowired
     private JobService jobService;
 
-    @PostMapping("/add")
-    public ResponseEntity<Job> addJob(@RequestBody Job job, @RequestParam Long userId, @RequestParam Long companyId) {
-        return ResponseEntity.status(HttpStatus.OK).body(jobService.addJob(job, userId, companyId));
-    }
-
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteJob(@PathVariable("id") Long id) {
         jobService.deleteJob(id);
@@ -39,7 +34,7 @@ public class JobController {
 
     @GetMapping("/all")
     public ResponseEntity<List<JobListViewTypeDTO>> getJobs(@RequestHeader(value = "Authorization") String authorizationHeader) {
-        return ResponseEntity.status(HttpStatus.OK).body(jobService.getAllJobs());
+        return ResponseEntity.status(HttpStatus.OK).body(jobService.getAllJobs(authorizationHeader));
     }
 
     @GetMapping("/favorites")
@@ -76,6 +71,16 @@ public class JobController {
         }
     }
 
+    @PostMapping("/add")
+    public ResponseEntity<?> addJob(@RequestHeader(value = "Authorization") String authorizationHeader, @RequestBody JobPageDTO jobPageDTO) {
+        try {
+            jobService.addJob(authorizationHeader, jobPageDTO);
+            return ResponseEntity.status(HttpStatus.OK).body("Job added!");
+        } catch (NotAuthorizedException e) {
+            return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED).body(e.getMessage());
+        }
+    }
+
     @PostMapping("/favorite")
     public ResponseEntity<?> addJobToFavorites(@RequestHeader(value = "Authorization") String authorizationHeader, @RequestParam(value = "jobId") Long jobId, @RequestParam boolean isFavorite) {
         try {
@@ -91,9 +96,10 @@ public class JobController {
     }
 
     @GetMapping("/location")
-    public ResponseEntity<List<JobListViewTypeDTO>> getJobsByLocation(@RequestParam String location) {
+    public ResponseEntity<List<JobListViewTypeDTO>> getJobsByLocation(@RequestHeader(value = "Authorization") String authorizationHeader,
+                                                                      @RequestParam String location) {
         try {
-            List<JobListViewTypeDTO> filteredJobs = jobService.getJobsByLocation(location);
+            List<JobListViewTypeDTO> filteredJobs = jobService.getJobsByLocation(authorizationHeader, location);
             return ResponseEntity.status(HttpStatus.OK).body(filteredJobs);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
@@ -101,9 +107,10 @@ public class JobController {
     }
 
     @GetMapping("/jobType")
-    public ResponseEntity<List<JobListViewTypeDTO>> getJobsByType(@RequestParam String jobType) {
+    public ResponseEntity<List<JobListViewTypeDTO>> getJobsByType(@RequestHeader(value = "Authorization") String authorizationHeader,
+                                                                  @RequestParam String jobType) {
         try {
-            List<JobListViewTypeDTO> filteredJobs = jobService.getJobsByType(jobType);
+            List<JobListViewTypeDTO> filteredJobs = jobService.getJobsByType(authorizationHeader, jobType);
             return ResponseEntity.status(HttpStatus.OK).body(filteredJobs);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);

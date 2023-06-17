@@ -3,15 +3,15 @@ package com.babydev.app.service.impl;
 import com.babydev.app.domain.dto.JobListViewTypeDTO;
 import com.babydev.app.domain.dto.JobPageDTO;
 import com.babydev.app.domain.entity.*;
+import com.babydev.app.exception.NotAuthorizedException;
+import com.babydev.app.helper.Permissions;
 import com.babydev.app.repository.CompanyRepository;
 import com.babydev.app.repository.JobRepository;
-import com.babydev.app.repository.UserRepository;
 import com.babydev.app.security.config.JwtService;
 import com.babydev.app.service.facade.JobServiceFacade;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
-import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.io.BufferedReader;
@@ -27,11 +27,11 @@ import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 @Service
-@RequiredArgsConstructor
+@AllArgsConstructor
 public class JobService implements JobServiceFacade {
-    @Autowired
+
     private final JobRepository jobRepository;
-    private final UserRepository userRepository;
+    private final UserService userService;
     private final CompanyRepository companyRepository;
 
     private final JwtService jwtService;
@@ -149,7 +149,7 @@ public class JobService implements JobServiceFacade {
     public List<JobListViewTypeDTO> sortByScore(String token) {
         List<Job> jobs = jobRepository.findAll();
         Long userId = jwtService.extractUserIdFromToken(token);
-        Optional<User> user = userRepository.findById(userId);
+        Optional<User> user = userService.findById(userId);
         List <JobListViewTypeDTO> jobsResult = new ArrayList<>();
 
         for (Job job : jobs) {
@@ -203,16 +203,25 @@ public class JobService implements JobServiceFacade {
                 .title(jobPageDTO.getTitle())
                 .description(jobPageDTO.getDescription())
                 .location(jobPageDTO.getLocation())
-                .postDate(LocalDate.now())
                 .type(jobPageDTO.getType())
+                .promotedUntil(LocalDateTime.of(2023, 12, 31, 1, 2))
+                .postDate(LocalDate.now())
                 .experienceRequired(jobPageDTO.getExperienceRequired())
                 .company(company)
                 .build();
     }
 
+    public void addJob(String token, JobPageDTO jobPageDTO) throws NotAuthorizedException {
+       final User user = userService.getUserFromToken(token);
+       final Company userCompany = user.getCompany();
+       if(!Permissions.isRecruiter(user)) {
+           throw  new NotAuthorizedException();
+       }
+       jobRepository.save( mapJobPageDTOToJob(jobPageDTO, userCompany));
+    }
     public List<JobListViewTypeDTO> getFavoriteJobs(String token) {
         Long userId = jwtService.extractUserIdFromToken(token);
-        User user = userRepository.findById(userId).get();
+        User user = userService.findById(userId).get();
         List<Job> favoriteJobs = user.getFavoriteJobs();
         List <JobListViewTypeDTO> jobResult = new ArrayList<>();
         for (Job job : favoriteJobs) {
@@ -224,7 +233,7 @@ public class JobService implements JobServiceFacade {
 
     public List<JobListViewTypeDTO> getAppliedJobs(String token) {
         Long userId = jwtService.extractUserIdFromToken(token);
-        User user = userRepository.findById(userId).get();
+        User user = userService.findById(userId).get();
         List<Job> appliedJobs = user.getAppliedJobs();
         List<JobListViewTypeDTO> jobResult = new ArrayList<>();
         for(Job job : appliedJobs) {
@@ -239,7 +248,7 @@ public class JobService implements JobServiceFacade {
     public JobPageDTO getJobPageById(Long id) { return mapJobPageToDTO(getJobById(id));}
 
     public Job addJob(Job job, Long userId, Long companyId) {
-        job.setAuthor(userRepository.findById(userId).get());
+        job.setAuthor(userService.findById(userId).get());
         job.setCompany(companyRepository.findCompanyByCompanyId(companyId).get());
         job.setPromotedUntil(LocalDateTime.of(1970, 12, 12, 10, 0));
         job.setPostDate(LocalDate.now());
@@ -287,8 +296,8 @@ public class JobService implements JobServiceFacade {
 //        return jobs;
 //    }
 
-    public List<JobListViewTypeDTO> getJobsByLocation(String location) {
-        List<JobListViewTypeDTO> jobs = getAllJobs();
+    public List<JobListViewTypeDTO> getJobsByLocation(String token, String location) {
+        List<JobListViewTypeDTO> jobs = getAllJobs(token);
 
         List<JobListViewTypeDTO> filteredJobs = jobs.stream()
                 .filter(j -> j.getLocation() == Location.valueOf(location))
@@ -300,8 +309,8 @@ public class JobService implements JobServiceFacade {
         }
     }
 
-    public List<JobListViewTypeDTO> getJobsByType(String jobType) {
-        List<JobListViewTypeDTO> jobs = getAllJobs();
+    public List<JobListViewTypeDTO> getJobsByType(String token, String jobType) {
+        List<JobListViewTypeDTO> jobs = getAllJobs(token);
 
         List<JobListViewTypeDTO> filteredJobs = jobs.stream()
                 .filter(j -> j.getType() == JobType.valueOf(jobType))
@@ -313,14 +322,15 @@ public class JobService implements JobServiceFacade {
         }
     }
 
-    public List<JobListViewTypeDTO> getAllJobs() {
-        List<Job> jobs = jobRepository.findAll();
-        List<JobListViewTypeDTO> jobsDTO = new ArrayList<JobListViewTypeDTO>();
-        for (Job job : jobs) {
-            jobsDTO.add(new JobListViewTypeDTO(job));
-        }
+    public List<JobListViewTypeDTO> getAllJobs(String token) {
+        Long userId = userService.getUserFromToken(token).getUserId();
+//        List<Job> jobs = jobRepository.findAll(userId);
+//        List<JobListViewTypeDTO> jobsDTO = new ArrayList<JobListViewTypeDTO>();
+//        for (Job job : jobs) {
+//            jobsDTO.add(new JobListViewTypeDTO(job));
+//        }
 
-        return jobsDTO;
+        return jobRepository.findAll(userId);
     }
 
 
@@ -330,7 +340,7 @@ public class JobService implements JobServiceFacade {
             throw new EntityNotFoundException("Couldn't find job");
         }
         Long userId = jwtService.extractUserIdFromToken(token);
-        Optional<User> user = userRepository.findById(userId);
+        Optional<User> user = userService.findById(userId);
         if(user.isEmpty()) {
             throw new EntityNotFoundException("Couldn't find user");
         }
@@ -347,7 +357,7 @@ public class JobService implements JobServiceFacade {
 
         job.get().getApplicants().add(user.get());
         user.get().getAppliedJobs().add(job.get());
-        userRepository.save(user.get());
+        userService.save(user.get());
         jobRepository.save(job.get());
 
     }
@@ -361,7 +371,7 @@ public class JobService implements JobServiceFacade {
         }
 
         Long userId = jwtService.extractUserIdFromToken(token);
-        Optional<User> user = userRepository.findById(userId);
+        Optional<User> user = userService.findById(userId);
         if(user.isEmpty()) {
             throw new EntityNotFoundException("Couldn't find user");
         }
@@ -374,7 +384,7 @@ public class JobService implements JobServiceFacade {
             user.get().getFavoriteJobs().add(job.get());
             job.get().getUsersFavorites().add(user.get());
         }
-        userRepository.save(user.get());
+        userService.save(user.get());
         jobRepository.save(job.get());
 
         return isFavorite;

@@ -1,9 +1,5 @@
 package com.babydev.app.helper;
 
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.time.temporal.ChronoUnit;
-
 import com.babydev.app.domain.dto.qualifications.EducationDTO;
 import com.babydev.app.domain.dto.qualifications.ExperienceDTO;
 import com.babydev.app.domain.dto.qualifications.SkillDTO;
@@ -13,6 +9,10 @@ import com.babydev.app.domain.entity.Education;
 import com.babydev.app.domain.entity.Experience;
 import com.babydev.app.domain.entity.Skill;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
+
 public class FormatUtil {
 	
 	// used for jobs
@@ -21,13 +21,7 @@ public class FormatUtil {
         long daysDiff = ChronoUnit.DAYS.between(date, currentDate);
 
         if (daysDiff < 1) {
-            long minutesDifference = ChronoUnit.MINUTES.between(date.atStartOfDay(), currentDate.atStartOfDay());
-            if (minutesDifference == 0) {
-            	return "Just now";
-            } else if (minutesDifference == 1) {
-            	return "One minute ago";
-            }
-            return minutesDifference + " minutes ago";
+            return "Today";
         } else if (daysDiff < 7) {
             long hoursDiff = ChronoUnit.HOURS.between(date.atStartOfDay(), currentDate.atStartOfDay());
             if (hoursDiff == 1) {

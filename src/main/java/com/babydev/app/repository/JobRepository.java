@@ -39,6 +39,13 @@ public interface JobRepository extends JpaRepository<Job,Long> {
             "WHERE (job.title LIKE %:keyword%)")
     List<JobListViewTypeDTO> searchJobs(@Param("keyword") String keyword, @Param("userId") String userId);
 
+    @Query(value = "SELECT NEW com.babydev.app.domain.dto.JobListViewTypeDTO(job.id, job.title, job.location, job.postDate, job.type, " +
+            "CASE WHEN uf.userId =:userId AND :userId != '' THEN TRUE ELSE FALSE END, job.experienceRequired, company.id, company.name, company.image) " +
+            "FROM Job job " +
+            "LEFT JOIN job.company company " +
+            "LEFT JOIN job.usersFavorites uf")
+    List<JobListViewTypeDTO> findAll(@Param("userId") Long userId);
+
 
 
 }

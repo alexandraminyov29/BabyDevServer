@@ -5,7 +5,12 @@ import com.babydev.app.domain.entity.Job;
 import com.babydev.app.domain.entity.JobType;
 import com.babydev.app.domain.entity.Location;
 import com.babydev.app.helper.FormatUtil;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
+
+import java.time.LocalDate;
 
 @Getter
 @Setter
@@ -56,13 +61,13 @@ public class JobListViewTypeDTO {
 
     }
 
-    public JobListViewTypeDTO(Long id, String title, Location location, JobType type, boolean isFavorite, String experienceRequired, Long companyId, String name, byte[] image) {
+    public JobListViewTypeDTO(Long id, String title, Location location, LocalDate postedDate, JobType type, boolean isFavorite, String experienceRequired, Long companyId, String name, byte[] image) {
         this.id = id;
         this.title = title;
         this.location = location;
         this.type = type;
         this.isFavorite = isFavorite;
-      //  this.postedDate = postedDate;
+        this.postedDate = FormatUtil.formatPostDateToString(postedDate);
         this.experienceRequired = experienceRequired;
         this.companyId = companyId;
         this.name = name;
