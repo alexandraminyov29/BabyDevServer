@@ -5,6 +5,7 @@ import com.babydev.app.domain.entity.Job;
 import com.babydev.app.domain.entity.JobType;
 import com.babydev.app.domain.entity.Location;
 import com.babydev.app.helper.FormatUtil;
+import com.babydev.app.helper.ImageUtil;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -52,7 +53,7 @@ public class JobPageDTO {
 
         this.companyId = company.getCompanyId();
         this.name = company.getName();
-        this.image = company.getImage() != null ? company.getImage() : new byte[1];
+        this.image = company.getImage() != null ? ImageUtil.decompressImage(company.getImage()) : null;
 
 
     }
