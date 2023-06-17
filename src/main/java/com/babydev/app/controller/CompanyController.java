@@ -17,8 +17,9 @@ public class CompanyController {
     private CompanyService companyService;
 
     @PostMapping("/add")
+    @Deprecated
     public ResponseEntity<Company> addCompany(@RequestBody Company company) {
-        return ResponseEntity.status(HttpStatus.OK).body(companyService.addCompany(company));
+        return ResponseEntity.status(HttpStatus.OK).body(companyService.save(company));
     }
 
     @DeleteMapping("/{id}")

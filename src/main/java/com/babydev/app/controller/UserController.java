@@ -1,9 +1,9 @@
 package com.babydev.app.controller;
 
-import com.babydev.app.domain.entity.Job;
-import com.babydev.app.exception.NotAuthorizedException;
-import com.babydev.app.service.impl.UserService;
-import jakarta.persistence.EntityNotFoundException;
+import java.io.IOException;
+import java.util.List;
+import java.util.NoSuchElementException;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpStatus;
@@ -12,14 +12,20 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.io.IOException;
-import java.util.List;
+import com.babydev.app.domain.dto.RecruiterRequest;
+import com.babydev.app.domain.dto.RecruiterRequestListViewType;
+import com.babydev.app.domain.entity.Job;
+import com.babydev.app.exception.NotAuthorizedException;
+import com.babydev.app.service.impl.UserService;
+
+import jakarta.persistence.EntityNotFoundException;
 
 @RestController
 @RequestMapping("/api/users")
@@ -84,5 +90,67 @@ public class UserController {
 			@RequestParam String email) {
 		boolean result = userService.hasCv(email);
 		return ResponseEntity.status(HttpStatus.OK).body(result);
+	}
+	
+	@PostMapping(value ="/recruiters/request")
+	public ResponseEntity<?> requestRecruiterAccount(@RequestBody RecruiterRequest request) {
+		try {
+			return ResponseEntity.status(HttpStatus.OK).body(userService.requestRecruiterAccount(request));
+		} catch (EntityNotFoundException e) {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+		}
+	}
+	
+	@GetMapping(value = "/recruiters/requests")
+	public ResponseEntity<List<RecruiterRequestListViewType>> getRequestListData(
+			@RequestHeader("Authorization") String authorizationHeader) {
+		try {
+			List<RecruiterRequestListViewType> result = userService.displayRequestListData(authorizationHeader);
+			return ResponseEntity.status(HttpStatus.OK).body(result);
+		} catch (NotAuthorizedException e) {
+			return new ResponseEntity<>(HttpStatus.METHOD_NOT_ALLOWED);
+		}
+	}
+	
+	@GetMapping(value = "/recruiters/requests/view")
+	public ResponseEntity<RecruiterRequest> getRequestData(
+			@RequestHeader("Authorization") String authorizationHeader,
+			@RequestParam String email) {
+		try {
+			RecruiterRequest result = userService.getRequestData(authorizationHeader, email);
+			return ResponseEntity.status(HttpStatus.OK).body(result);
+		} catch (NotAuthorizedException e) {
+			return new ResponseEntity<>(HttpStatus.METHOD_NOT_ALLOWED);
+		} catch (NoSuchElementException e) {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+		}
+	}
+	
+	@PatchMapping(value = "/recruiters/requests/resolve")
+	public ResponseEntity<?> acceptRequestFromRecruiter(
+			@RequestHeader("Authorization") String authorizationHeader,
+			@RequestParam String email) {
+		try {
+			userService.acceptRequestFromRecruiter(authorizationHeader, email);
+			return ResponseEntity.status(HttpStatus.OK).body("OK");
+		} catch (NotAuthorizedException e) {
+			return new ResponseEntity<>(HttpStatus.METHOD_NOT_ALLOWED);
+		} catch (NoSuchElementException e) {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+		}
+	}
+	
+	@DeleteMapping(value = "/recruiters/requests/resolve")
+	public ResponseEntity<?> deleteRequestFromRecruiter(
+			@RequestHeader("Authorization") String authorizationHeader,
+			@RequestParam String email) {
+		try {
+			userService.deleteRequestFromRecruiter(authorizationHeader, email);
+			return ResponseEntity.status(HttpStatus.OK).body("OK");
+		} catch (NotAuthorizedException e) {
+			return new ResponseEntity<>(HttpStatus.METHOD_NOT_ALLOWED);
+		} catch (NoSuchElementException e) {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+		}
 	}
 }
