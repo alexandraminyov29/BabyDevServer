@@ -56,7 +56,7 @@ public class JobListViewTypeDTO {
 
     }
 
-    public JobListViewTypeDTO(Long id, String title,Location location, JobType type, boolean isFavorite, String experienceRequired, Long companyId, String name, byte[] image) {
+    public JobListViewTypeDTO(Long id, String title, Location location, JobType type, boolean isFavorite, String experienceRequired, Long companyId, String name, byte[] image) {
         this.id = id;
         this.title = title;
         this.location = location;

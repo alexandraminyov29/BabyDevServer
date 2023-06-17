@@ -181,6 +181,35 @@ public class JobService implements JobServiceFacade {
                 build();
     }
 
+    private JobPageDTO mapJobPageToDTO(Job job) {
+        final Company company = job.getCompany();
+        return JobPageDTO.builder()
+                .id(job.getJobId())
+                .title(job.getTitle())
+                .description(job.getDescription())
+                .location(job.getLocation())
+                .postedDate(job.getPostDate().toString())
+                .type(job.getType())
+                .experienceRequired(job.getExperienceRequired())
+                .companyId(company.getCompanyId())
+                .name(company.getName())
+                .image(company.getImage()).
+                build();
+    }
+
+    private Job mapJobPageDTOToJob(JobPageDTO jobPageDTO, Company company) {
+        return Job.builder()
+                .jobId(jobPageDTO.getId())
+                .title(jobPageDTO.getTitle())
+                .description(jobPageDTO.getDescription())
+                .location(jobPageDTO.getLocation())
+                .postDate(LocalDate.now())
+                .type(jobPageDTO.getType())
+                .experienceRequired(jobPageDTO.getExperienceRequired())
+                .company(company)
+                .build();
+    }
+
     public List<JobListViewTypeDTO> getFavoriteJobs(String token) {
         Long userId = jwtService.extractUserIdFromToken(token);
         User user = userRepository.findById(userId).get();
@@ -192,9 +221,22 @@ public class JobService implements JobServiceFacade {
         }
         return jobResult;
     }
+
+    public List<JobListViewTypeDTO> getAppliedJobs(String token) {
+        Long userId = jwtService.extractUserIdFromToken(token);
+        User user = userRepository.findById(userId).get();
+        List<Job> appliedJobs = user.getAppliedJobs();
+        List<JobListViewTypeDTO> jobResult = new ArrayList<>();
+        for(Job job : appliedJobs) {
+            jobResult.add(mapJobToDTO(job));
+        }
+        return jobResult;
+    }
     public Job getJobById(Long id) {
         return jobRepository.findById(id).get();
     }
+
+    public JobPageDTO getJobPageById(Long id) { return mapJobPageToDTO(getJobById(id));}
 
     public Job addJob(Job job, Long userId, Long companyId) {
         job.setAuthor(userRepository.findById(userId).get());
@@ -281,6 +323,7 @@ public class JobService implements JobServiceFacade {
         return jobsDTO;
     }
 
+
     public void applyJob(String token, Long jobId) throws RuntimeException{
         Optional<Job> job = jobRepository.findById(jobId);
         if(job.isEmpty()) {
@@ -303,6 +346,8 @@ public class JobService implements JobServiceFacade {
         }
 
         job.get().getApplicants().add(user.get());
+        user.get().getAppliedJobs().add(job.get());
+        userRepository.save(user.get());
         jobRepository.save(job.get());
 
     }

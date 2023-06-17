@@ -47,6 +47,11 @@ public class JobController {
         return ResponseEntity.status(HttpStatus.OK).body(jobService.getFavoriteJobs(authorizationHeader));
     }
 
+    @GetMapping("/applied")
+    public ResponseEntity<List<JobListViewTypeDTO>> getAppliedJobs(@RequestHeader(value = "Authorization") String authorizationHeader) {
+        return ResponseEntity.status(HttpStatus.OK).body(jobService.getAppliedJobs(authorizationHeader));
+    }
+
     @GetMapping("/recommend")
     public ResponseEntity<List<JobListViewTypeDTO>> recommendJobs(@RequestHeader(value = "Authorization") String authorizationHeader) {
             return ResponseEntity.status(HttpStatus.OK).body(jobService.sortByScore(authorizationHeader));
@@ -103,5 +108,11 @@ public class JobController {
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         }
+    }
+
+    @GetMapping("/jobDetails")
+    public ResponseEntity<JobPageDTO> getJobDetails(@RequestParam Long id) {
+        JobPageDTO jobDetails = jobService.getJobPageById(id);
+        return  ResponseEntity.status(HttpStatus.OK).body(jobDetails);
     }
 }
