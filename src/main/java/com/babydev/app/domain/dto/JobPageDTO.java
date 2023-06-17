@@ -68,6 +68,6 @@ public class JobPageDTO {
         this.experienceRequired = experienceRequired;
         this.companyId = companyId;
         this.name = name;
-        this.image = image;
+        this.image = image != null ? ImageUtil.decompressImage(image) : null;
     }
 }

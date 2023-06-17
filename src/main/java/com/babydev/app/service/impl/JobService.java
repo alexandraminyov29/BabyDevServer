@@ -174,6 +174,7 @@ public class JobService implements JobServiceFacade {
                 .title(job.getTitle())
                 .location(job.getLocation())
                 .type(job.getType())
+                .postedDate(job.getPostDate().toString())
                 .experienceRequired(job.getExperienceRequired())
                 .companyId(company.getCompanyId())
                 .name(company.getName())
@@ -330,7 +331,7 @@ public class JobService implements JobServiceFacade {
 //            jobsDTO.add(new JobListViewTypeDTO(job));
 //        }
 
-        return jobRepository.findAll(userId);
+        return jobRepository.findAll(userId.toString());
     }
 
 

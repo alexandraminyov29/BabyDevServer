@@ -31,7 +31,7 @@ public interface JobRepository extends JpaRepository<Job,Long> {
             "WHERE job.jobId =:jobId", nativeQuery = false)
     JobPageDTO findJobDetails(@Param("jobId") long jobId, @Param("userId") long userId);
 
-    @Query(value = "SELECT NEW com.babydev.app.domain.dto.JobListViewTypeDTO(job.id, job.title, job.location, job.type, " +
+    @Query(value = "SELECT NEW com.babydev.app.domain.dto.JobListViewTypeDTO(job.id, job.title, job.location, job.postDate, job.type, " +
             "CASE WHEN uf.userId =:userId AND :userId != '' THEN TRUE ELSE FALSE END, job.experienceRequired, company.id, company.name, company.image) " +
             "FROM Job job " +
             "LEFT JOIN job.company company " +
@@ -44,7 +44,7 @@ public interface JobRepository extends JpaRepository<Job,Long> {
             "FROM Job job " +
             "LEFT JOIN job.company company " +
             "LEFT JOIN job.usersFavorites uf")
-    List<JobListViewTypeDTO> findAll(@Param("userId") Long userId);
+    List<JobListViewTypeDTO> findAll(@Param("userId") String userId);
 
 
 
