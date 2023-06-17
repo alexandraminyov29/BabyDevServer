@@ -1,6 +1,7 @@
 package com.babydev.app.service.impl;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Comparator;
 import java.util.List;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Service;
 import com.babydev.app.domain.dto.CompanyInfoDTO;
 import com.babydev.app.domain.dto.PersonalInformationDTO;
 import com.babydev.app.domain.dto.RecruiterRequest;
+import com.babydev.app.domain.dto.RecruiterRequestListViewType;
 import com.babydev.app.domain.dto.UserInfoDTO;
 import com.babydev.app.domain.entity.Company;
 import com.babydev.app.domain.entity.Education;
@@ -138,13 +140,16 @@ public class UserService implements UserServiceFacade {
 		
 		CompanyInfoDTO companyInfo = request.getCompany();
 		Company company;
+		byte[] companyImage;
 		
 		if (companyInfo.isExistent()) {
 			company = companyService.getCompanyByName(companyInfo.getName());
+			companyImage = ImageUtil.decompressImage(company.getImage());
 		} else {
+			companyImage = ImageUtil.compressImage(Base64.getDecoder().decode(companyInfo.getImage()));
 			company = Company.builder()
 					.name(companyInfo.getName())
-					.image(ImageUtil.compressImage(Base64.getDecoder().decode(companyInfo.getImage())))
+					.image(companyImage)
 					.webPage(companyInfo.getWebPage())
 					.build();
 		}
@@ -157,7 +162,8 @@ public class UserService implements UserServiceFacade {
 	            .password(passwordEncoder.encode(request.getPassword()))
 	            .role(UserRole.RECRUITER)
 	            .company(company)
-	            .imageData(null)
+	            .isActive(false)
+	            .imageData(companyImage)
 	            .build();
 		
 		userRepository.save(user);
@@ -182,5 +188,78 @@ public class UserService implements UserServiceFacade {
 
 	public boolean hasCv(String email) {
 		return getUserByEmail(email).getHasCv();
+	}
+
+	public List<RecruiterRequestListViewType> displayRequestListData(String authorizationHeader)
+			throws NotAuthorizedException {
+		final User user = getUserFromToken(authorizationHeader);
+		if (!Permissions.isAdmin(user)) {
+			throw new NotAuthorizedException();
+		}
+
+		final List<User> recruiters = userRepository.findAllByRoleAndIsActive(UserRole.RECRUITER, false);
+		List<RecruiterRequestListViewType> result = new ArrayList<RecruiterRequestListViewType>();
+		
+		for (User recruiter : recruiters) {
+			result.add(
+					RecruiterRequestListViewType.builder()
+					.firstName(recruiter.getFirstName())
+					.lastName(recruiter.getLastName())
+					.email(recruiter.getEmail())
+					.companyName(recruiter.getCompany().getName())
+					.build()
+					);
+		}
+
+		return result;
+	}
+
+	public RecruiterRequest getRequestData(String authorizationHeader, String email) throws NotAuthorizedException {
+		final User user = getUserFromToken(authorizationHeader);
+		if (!Permissions.isAdmin(user)) {
+			throw new NotAuthorizedException();
+		}
+		
+		final User userData = userRepository.findByEmail(email).orElseThrow();
+		final Company userCompany = userData.getCompany();
+		return RecruiterRequest.builder()
+				.firstName(userData.getFirstName())
+				.lastName(userData.getLastName())
+				.email(userData.getEmail())
+				.phoneNumber(userData.getPhoneNumber())
+				.company(CompanyInfoDTO.builder()
+						.name(userCompany.getName())
+						.webPage(userCompany.getWebPage())
+						.imageData(ImageUtil.decompressImage(userCompany.getImage()))
+						.build())
+				.build();
+	}
+
+	public void acceptRequestFromRecruiter(String authorizationHeader, String email) throws NotAuthorizedException {
+		final User user = getUserFromToken(authorizationHeader);
+		if (!Permissions.isAdmin(user)) {
+			throw new NotAuthorizedException();
+		}
+		
+		final User recruiter = userRepository.findByEmail(email).orElseThrow();
+		recruiter.setIsActive(true);
+		userRepository.save(recruiter);
+	}
+
+	public void deleteRequestFromRecruiter(String authorizationHeader, String email) throws NotAuthorizedException {
+		final User user = getUserFromToken(authorizationHeader);
+		if (!Permissions.isAdmin(user)) {
+			throw new NotAuthorizedException();
+		}
+		
+		final User recruiter = userRepository.findByEmail(email).orElseThrow();
+		Company company = recruiter.getCompany();
+		final boolean isLastRecruiter = company.getRecruiters().size() == 1;
+		
+		userRepository.deleteById(recruiter.getUserId());
+		
+		if (isLastRecruiter) {
+			companyService.deleteCompany(company.getCompanyId());
+		}
 	}
 }

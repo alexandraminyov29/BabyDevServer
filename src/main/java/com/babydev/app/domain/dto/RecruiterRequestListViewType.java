@@ -11,10 +11,9 @@ import lombok.Setter;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class CompanyInfoDTO {
-	private boolean existent;
-	private String name;
-	private String webPage;
-	private String image;
-	private byte[] imageData;
+public class RecruiterRequestListViewType {
+	private String firstName;
+    private String lastName;
+    private String email;
+    private String companyName;
 }
