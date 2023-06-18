@@ -25,7 +25,7 @@ public class Cstl {
 
 	public static String[] allowedEndpoints = { "/api/auth/**", "/api/users/recruiters/request", "api/users/favorite",
 			// JobController
-			"/api/jobs/all", "/api/jobs/search" };
+			"/api/jobs/all", "/api/jobs/search", "/api/jobs/jobDetails" };
 
 	public static List<String> europassTemplate = Arrays.asList("Curriculum", "Vitae", "Replace", "with", "First",
 			"name(s)", "Surname(s)", "PERSONAL", "INFORMATION", "Replace", "with", "First", "name(s)", "Surname(s)",
