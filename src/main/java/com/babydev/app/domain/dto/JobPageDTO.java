@@ -1,18 +1,19 @@
 package com.babydev.app.domain.dto;
 
+import java.time.LocalDate;
+
 import com.babydev.app.domain.entity.Company;
 import com.babydev.app.domain.entity.Job;
 import com.babydev.app.domain.entity.JobType;
 import com.babydev.app.domain.entity.Location;
 import com.babydev.app.helper.FormatUtil;
 import com.babydev.app.helper.ImageUtil;
-import lombok.Builder;
+
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
-@Builder
 public class JobPageDTO {
 
     private Long id;
@@ -28,13 +29,15 @@ public class JobPageDTO {
     private String postedDate;
 
     private String experienceRequired;
+    
+    private boolean hasApplied;
 
     private Long companyId;
 
     private String name;
-
-    private String companyUrl;
-
+    
+    private String link; 
+    
     private byte[] image;
 
     public JobPageDTO() {
@@ -48,28 +51,30 @@ public class JobPageDTO {
         this.type = job.getType();
         this.postedDate = FormatUtil.formatPostDateToString(job.getPostDate());
         this.experienceRequired = job.getExperienceRequired();
+        this.description = job.getDescription();
+        // this.isPromoted = job.getPromotedUntil().compareTo(LocalDateTime.now()) > 0;
 
         final Company company = job.getCompany();
-
+        
+        this.link = company.getWebPage();
         this.companyId = company.getCompanyId();
         this.name = company.getName();
-        this.companyUrl = company.getWebPage();
         this.image = company.getImage() != null ? ImageUtil.decompressImage(company.getImage()) : null;
-
-
     }
-    public JobPageDTO(java.lang.Long id, java.lang.String title, java.lang.String description, Location location, JobType type, String postedDate, java.lang.String experienceRequired, java.lang.Long companyId, java.lang.String name, java.lang.String companyUrl, byte[] image) {
+    
+    public JobPageDTO(Long id, String title, String description, Location location, JobType type, LocalDate postedDate, String experienceRequired, Boolean hasApplied, Long companyId, String name, String webPage, byte[] image) {
         super();
         this.id = id;
         this.title = title;
         this.description = description;
         this.location = location;
         this.type = type;
-        this.postedDate = postedDate;
+        this.postedDate = FormatUtil.formatPostDateToString(postedDate);
         this.experienceRequired = experienceRequired;
+        this.hasApplied = hasApplied;
         this.companyId = companyId;
         this.name = name;
-        this.companyUrl = companyUrl;
+        this.link = webPage;
         this.image = image != null ? ImageUtil.decompressImage(image) : null;
     }
 }

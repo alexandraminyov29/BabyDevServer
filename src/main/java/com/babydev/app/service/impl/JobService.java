@@ -44,8 +44,10 @@ public class JobService implements JobServiceFacade {
         return jobRepository.findById(id).get();
     }
 
-    public JobPageDTO getJobPageById(Long id) {
-        return mapJobPageToDTO(getJobById(id));
+    public JobPageDTO getJobPageById(String token, Long id) {
+ 
+    	User user = userService.getUserFromToken(token);
+    	return jobRepository.findJobDetails(id, user.getUserId());
     }
 
     public List<JobListViewTypeDTO> getAllRecruiterJobs(String token) throws NotAuthorizedException {
@@ -73,19 +75,7 @@ public class JobService implements JobServiceFacade {
     }
 
     private JobPageDTO mapJobPageToDTO(Job job) {
-        final Company company = job.getCompany();
-        return JobPageDTO.builder()
-                .id(job.getJobId())
-                .title(job.getTitle())
-                .description(job.getDescription())
-                .location(job.getLocation())
-                .postedDate(job.getPostDate().toString())
-                .type(job.getType())
-                .experienceRequired(job.getExperienceRequired())
-                .companyId(company.getCompanyId())
-                .name(company.getName())
-                .image(company.getImage()).
-                build();
+    	return new JobPageDTO(job);
     }
 
     private Job mapJobPageDTOToJob(JobPageDTO jobPageDTO, Company company) {

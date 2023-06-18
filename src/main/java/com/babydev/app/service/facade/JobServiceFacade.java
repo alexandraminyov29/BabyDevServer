@@ -21,7 +21,7 @@ public interface JobServiceFacade {
 
     public JobPageDTO findJobById(Long jobId, Long userId);
 
-    public JobPageDTO getJobPageById(Long id);
+    public JobPageDTO getJobPageById(String token, Long id);
 
   //  public List<JobListViewTypeDTO> sortAscJobsByDateOfPosting(List<JobListViewTypeDTO> jobs);
 

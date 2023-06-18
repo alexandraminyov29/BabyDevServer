@@ -141,8 +141,8 @@ public class JobController {
     }
 
     @GetMapping("/jobDetails")
-    public ResponseEntity<JobPageDTO> getJobDetails(@RequestParam Long id) {
-        JobPageDTO jobDetails = jobService.getJobPageById(id);
+    public ResponseEntity<JobPageDTO> getJobDetails(@RequestHeader(value = "Authorization") String token, @RequestParam Long id) {
+        JobPageDTO jobDetails = jobService.getJobPageById(token, id);
         return  ResponseEntity.status(HttpStatus.OK).body(jobDetails);
     }
 }
