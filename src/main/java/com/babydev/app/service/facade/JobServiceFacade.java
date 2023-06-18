@@ -3,6 +3,7 @@ package com.babydev.app.service.facade;
 import com.babydev.app.domain.dto.JobListViewTypeDTO;
 import com.babydev.app.domain.dto.JobPageDTO;
 import com.babydev.app.domain.entity.Job;
+import com.babydev.app.exception.NotAuthorizedException;
 
 import java.util.List;
 
@@ -12,7 +13,9 @@ public interface JobServiceFacade {
 
     public Job getJobById(Long id);
 
-    public Job addJob(Job job, Long userId, Long companyId);
+    public void addJob(String token, JobPageDTO jobPageDT) throws NotAuthorizedException;
+
+    public void editJob(String token, Job jobPageDTO, Long jobId) throws NotAuthorizedException;
 
     public void deleteJob(Long id);
 

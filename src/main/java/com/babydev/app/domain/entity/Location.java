@@ -2,6 +2,7 @@ package com.babydev.app.domain.entity;
 
 public enum Location {
     ALBA_IULIA("Alba Iulia"),
+    IASI("Iasi"),
     ARAD("Arad"),
     PITESTI("Pitesti"),
     BACAU("Bacau"),
