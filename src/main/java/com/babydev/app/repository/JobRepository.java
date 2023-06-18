@@ -24,7 +24,7 @@ public interface JobRepository extends JpaRepository<Job,Long> {
     @Query(value = "SELECT NEW com.babydev.app.domain.dto.JobPageDTO(job.jobId, job.title, job.description, job.postDate, " +
             "job.experienceRequired, " +
             "CASE WHEN (SELECT count(*) from job.applicants app WHERE app.id =:userId) > 0 THEN TRUE ELSE FALSE END, " +
-            "company.companyId, company.name, " +
+            "company.companyId, company.name, company.webPage, " +
             "company.image) " +
             "FROM Job job " +
             "LEFT JOIN job.company company " +
@@ -46,6 +46,11 @@ public interface JobRepository extends JpaRepository<Job,Long> {
             "LEFT JOIN job.usersFavorites uf")
     List<JobListViewTypeDTO> findAll(@Param("userId") String userId);
 
-
+    @Query(value = "SELECT NEW com.babydev.app.domain.dto.JobListViewTypeDTO(job.id, job.title, job.location, job.postDate, job.type, " +
+            "false, job.experienceRequired, company.id, company.name, company.image) " +
+            "FROM Job job " +
+            "LEFT JOIN job.company company " +
+            "WHERE company.id = :companyId")
+    List<JobListViewTypeDTO> findAllRecruiterJobs(@Param("companyId") String companyId);
 
 }

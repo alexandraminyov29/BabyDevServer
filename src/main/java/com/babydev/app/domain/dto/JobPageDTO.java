@@ -33,6 +33,8 @@ public class JobPageDTO {
 
     private String name;
 
+    private String companyUrl;
+
     private byte[] image;
 
     public JobPageDTO() {
@@ -47,17 +49,16 @@ public class JobPageDTO {
         this.postedDate = FormatUtil.formatPostDateToString(job.getPostDate());
         this.experienceRequired = job.getExperienceRequired();
 
-        // this.isPromoted = job.getPromotedUntil().compareTo(LocalDateTime.now()) > 0;
-
         final Company company = job.getCompany();
 
         this.companyId = company.getCompanyId();
         this.name = company.getName();
+        this.companyUrl = company.getWebPage();
         this.image = company.getImage() != null ? ImageUtil.decompressImage(company.getImage()) : null;
 
 
     }
-    public JobPageDTO(java.lang.Long id, java.lang.String title, java.lang.String description, Location location, JobType type, String postedDate, java.lang.String experienceRequired, java.lang.Long companyId, java.lang.String name, byte[] image) {
+    public JobPageDTO(java.lang.Long id, java.lang.String title, java.lang.String description, Location location, JobType type, String postedDate, java.lang.String experienceRequired, java.lang.Long companyId, java.lang.String name, java.lang.String companyUrl, byte[] image) {
         super();
         this.id = id;
         this.title = title;
@@ -68,6 +69,7 @@ public class JobPageDTO {
         this.experienceRequired = experienceRequired;
         this.companyId = companyId;
         this.name = name;
+        this.companyUrl = companyUrl;
         this.image = image != null ? ImageUtil.decompressImage(image) : null;
     }
 }

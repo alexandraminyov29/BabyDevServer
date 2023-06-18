@@ -38,6 +38,15 @@ public class JobController {
         return ResponseEntity.status(HttpStatus.OK).body(jobService.getAllJobs(authorizationHeader));
     }
 
+    @GetMapping("/rall")
+    public ResponseEntity<?> getRecruiterJobs(@RequestHeader(value = "Authorization") String authorizationHeader) {
+        try {
+            return ResponseEntity.status(HttpStatus.OK).body(jobService.getAllRecruiterJobs(authorizationHeader));
+        } catch (NotAuthorizedException e) {
+            return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED).body(e.getMessage());
+        }
+    }
+
     @GetMapping("/favorites")
     public ResponseEntity<List<JobListViewTypeDTO>> getFavoriteJobs(@RequestHeader(value = "Authorization") String authorizationHeader) {
         return ResponseEntity.status(HttpStatus.OK).body(jobService.getFavoriteJobs(authorizationHeader));
