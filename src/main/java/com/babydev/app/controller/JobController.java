@@ -2,6 +2,7 @@ package com.babydev.app.controller;
 
 import com.babydev.app.domain.dto.JobListViewTypeDTO;
 import com.babydev.app.domain.dto.JobPageDTO;
+import com.babydev.app.domain.entity.Job;
 import com.babydev.app.exception.NotAuthorizedException;
 import com.babydev.app.service.impl.JobService;
 import jakarta.persistence.EntityNotFoundException;
@@ -76,6 +77,19 @@ public class JobController {
         try {
             jobService.addJob(authorizationHeader, jobPageDTO);
             return ResponseEntity.status(HttpStatus.OK).body("Job added!");
+        } catch (NotAuthorizedException e) {
+            return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED).body(e.getMessage());
+        }
+    }
+
+    @PutMapping("/editJob")
+    public ResponseEntity<?> updateJob (
+            @RequestHeader("Authorization") String authorizationHeader,
+            @RequestBody Job job,
+            @RequestParam  Long jobId) {
+        try {
+            jobService.editJob(authorizationHeader, job, jobId);
+            return ResponseEntity.status(HttpStatus.OK).body("Job updated!");
         } catch (NotAuthorizedException e) {
             return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED).body(e.getMessage());
         }

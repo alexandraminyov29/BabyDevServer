@@ -37,13 +37,105 @@ public class JobService implements JobServiceFacade {
     private final JwtService jwtService;
 
     public List<Job> getJobs() {
-//         = null;
-
-
-
         return jobRepository.findAll();
     }
 
+    public Job getJobById(Long id) {
+        return jobRepository.findById(id).get();
+    }
+
+    public JobPageDTO getJobPageById(Long id) { return mapJobPageToDTO(getJobById(id));}
+
+    private JobListViewTypeDTO mapJobToDTO(Job job) {
+        final Company company = job.getCompany();
+        return JobListViewTypeDTO.builder()
+                .id(job.getJobId())
+                .title(job.getTitle())
+                .location(job.getLocation())
+                .type(job.getType())
+                .postedDate(job.getPostDate().toString())
+                .experienceRequired(job.getExperienceRequired())
+                .companyId(company.getCompanyId())
+                .name(company.getName())
+                .image(company.getImage()).
+                build();
+    }
+
+    private JobPageDTO mapJobPageToDTO(Job job) {
+        final Company company = job.getCompany();
+        return JobPageDTO.builder()
+                .id(job.getJobId())
+                .title(job.getTitle())
+                .description(job.getDescription())
+                .location(job.getLocation())
+                .postedDate(job.getPostDate().toString())
+                .type(job.getType())
+                .experienceRequired(job.getExperienceRequired())
+                .companyId(company.getCompanyId())
+                .name(company.getName())
+                .image(company.getImage()).
+                build();
+    }
+
+    private Job mapJobPageDTOToJob(JobPageDTO jobPageDTO, Company company) {
+        return Job.builder()
+                .jobId(jobPageDTO.getId())
+                .title(jobPageDTO.getTitle())
+                .description(jobPageDTO.getDescription())
+                .location(jobPageDTO.getLocation())
+                .type(jobPageDTO.getType())
+                .promotedUntil(LocalDateTime.of(2023, 12, 31, 1, 2))
+                .postDate(LocalDate.now())
+                .experienceRequired(jobPageDTO.getExperienceRequired())
+                .company(company)
+                .build();
+    }
+
+    public void addJob(String token, JobPageDTO jobPageDTO) throws NotAuthorizedException {
+        final User user = userService.getUserFromToken(token);
+        final Company userCompany = user.getCompany();
+        if(!Permissions.isRecruiter(user)) {
+            throw  new NotAuthorizedException();
+        }
+        jobRepository.save( mapJobPageDTOToJob(jobPageDTO, userCompany));
+    }
+
+    public void editJob(String token, Job job, Long jobId) throws NotAuthorizedException {
+        final User user = userService.getUserFromToken(token);
+        final Company userCompany = user.getCompany();
+        if(!Permissions.isRecruiter(user)) {
+            throw  new NotAuthorizedException();
+        }
+        Job updatedJob = jobRepository.findById(jobId).get();
+        updatedJob.setTitle(job.getTitle());
+        updatedJob.setDescription(job.getDescription());
+        updatedJob.setLocation(job.getLocation());
+        updatedJob.setType(job.getType());
+        updatedJob.setExperienceRequired(job.getExperienceRequired());
+        jobRepository.save(updatedJob);
+    }
+    public List<JobListViewTypeDTO> getFavoriteJobs(String token) {
+        Long userId = jwtService.extractUserIdFromToken(token);
+        User user = userService.findById(userId).get();
+        List<Job> favoriteJobs = user.getFavoriteJobs();
+        List <JobListViewTypeDTO> jobResult = new ArrayList<>();
+        for (Job job : favoriteJobs) {
+            mapJobToDTO(job);
+            jobResult.add(mapJobToDTO(job));
+        }
+        return jobResult;
+    }
+
+    public List<JobListViewTypeDTO> getAppliedJobs(String token) {
+        Long userId = jwtService.extractUserIdFromToken(token);
+        User user = userService.findById(userId).get();
+        List<Job> appliedJobs = user.getAppliedJobs();
+        List<JobListViewTypeDTO> jobResult = new ArrayList<>();
+        for(Job job : appliedJobs) {
+            jobResult.add(mapJobToDTO(job));
+        }
+        return jobResult;
+    }
     public List<String> findSkillInJobDescription(String inputText) throws IOException, InterruptedException {
         String scriptPath = "files/scripts/skillScript.py";
 
@@ -165,96 +257,6 @@ public class JobService implements JobServiceFacade {
         return jobsResult.stream()
                 .sorted(Comparator.comparingInt(JobListViewTypeDTO::getScore).reversed())
                 .collect(Collectors.toList());
-    }
-
-    private JobListViewTypeDTO mapJobToDTO(Job job) {
-        final Company company = job.getCompany();
-        return JobListViewTypeDTO.builder()
-                .id(job.getJobId())
-                .title(job.getTitle())
-                .location(job.getLocation())
-                .type(job.getType())
-                .postedDate(job.getPostDate().toString())
-                .experienceRequired(job.getExperienceRequired())
-                .companyId(company.getCompanyId())
-                .name(company.getName())
-                .image(company.getImage()).
-                build();
-    }
-
-    private JobPageDTO mapJobPageToDTO(Job job) {
-        final Company company = job.getCompany();
-        return JobPageDTO.builder()
-                .id(job.getJobId())
-                .title(job.getTitle())
-                .description(job.getDescription())
-                .location(job.getLocation())
-                .postedDate(job.getPostDate().toString())
-                .type(job.getType())
-                .experienceRequired(job.getExperienceRequired())
-                .companyId(company.getCompanyId())
-                .name(company.getName())
-                .image(company.getImage()).
-                build();
-    }
-
-    private Job mapJobPageDTOToJob(JobPageDTO jobPageDTO, Company company) {
-        return Job.builder()
-                .jobId(jobPageDTO.getId())
-                .title(jobPageDTO.getTitle())
-                .description(jobPageDTO.getDescription())
-                .location(jobPageDTO.getLocation())
-                .type(jobPageDTO.getType())
-                .promotedUntil(LocalDateTime.of(2023, 12, 31, 1, 2))
-                .postDate(LocalDate.now())
-                .experienceRequired(jobPageDTO.getExperienceRequired())
-                .company(company)
-                .build();
-    }
-
-    public void addJob(String token, JobPageDTO jobPageDTO) throws NotAuthorizedException {
-       final User user = userService.getUserFromToken(token);
-       final Company userCompany = user.getCompany();
-       if(!Permissions.isRecruiter(user)) {
-           throw  new NotAuthorizedException();
-       }
-       jobRepository.save( mapJobPageDTOToJob(jobPageDTO, userCompany));
-    }
-    public List<JobListViewTypeDTO> getFavoriteJobs(String token) {
-        Long userId = jwtService.extractUserIdFromToken(token);
-        User user = userService.findById(userId).get();
-        List<Job> favoriteJobs = user.getFavoriteJobs();
-        List <JobListViewTypeDTO> jobResult = new ArrayList<>();
-        for (Job job : favoriteJobs) {
-            mapJobToDTO(job);
-            jobResult.add(mapJobToDTO(job));
-        }
-        return jobResult;
-    }
-
-    public List<JobListViewTypeDTO> getAppliedJobs(String token) {
-        Long userId = jwtService.extractUserIdFromToken(token);
-        User user = userService.findById(userId).get();
-        List<Job> appliedJobs = user.getAppliedJobs();
-        List<JobListViewTypeDTO> jobResult = new ArrayList<>();
-        for(Job job : appliedJobs) {
-            jobResult.add(mapJobToDTO(job));
-        }
-        return jobResult;
-    }
-    public Job getJobById(Long id) {
-        return jobRepository.findById(id).get();
-    }
-
-    public JobPageDTO getJobPageById(Long id) { return mapJobPageToDTO(getJobById(id));}
-
-    public Job addJob(Job job, Long userId, Long companyId) {
-        job.setAuthor(userService.findById(userId).get());
-        job.setCompany(companyRepository.findCompanyByCompanyId(companyId).get());
-        job.setPromotedUntil(LocalDateTime.of(1970, 12, 12, 10, 0));
-        job.setPostDate(LocalDate.now());
-       // job.setRequiredSkill();
-        return jobRepository.save(job);
     }
 
     public List<JobListViewTypeDTO> searchJobs(String keyword, String token) {
