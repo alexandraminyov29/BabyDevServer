@@ -51,8 +51,6 @@ public class JobListViewTypeDTO {
         this.postedDate = FormatUtil.formatPostDateToString(job.getPostDate());
         this.experienceRequired = job.getExperienceRequired();
 
-       // this.isPromoted = job.getPromotedUntil().compareTo(LocalDateTime.now()) > 0;
-
         final Company company = job.getCompany();
 
         this.companyId = company.getCompanyId();
@@ -72,7 +70,6 @@ public class JobListViewTypeDTO {
         this.experienceRequired = experienceRequired;
         this.companyId = companyId;
         this.name = name;
-        this.image = image;
-      //  this.isPromoted = isPromoted;
+        this.image = image != null ? ImageUtil.decompressImage(image) : null;
     }
 }
