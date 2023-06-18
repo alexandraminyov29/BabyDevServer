@@ -44,7 +44,18 @@ public class JobService implements JobServiceFacade {
         return jobRepository.findById(id).get();
     }
 
-    public JobPageDTO getJobPageById(Long id) { return mapJobPageToDTO(getJobById(id));}
+    public JobPageDTO getJobPageById(Long id) {
+        return mapJobPageToDTO(getJobById(id));
+    }
+
+    public List<JobListViewTypeDTO> getAllRecruiterJobs(String token) throws NotAuthorizedException {
+        User user = userService.getUserFromToken(token);
+        final Company userCompany = user.getCompany();
+        if(!Permissions.isRecruiter(user)) {
+            throw new NotAuthorizedException();
+        }
+        return jobRepository.findAllRecruiterJobs(userCompany.getCompanyId().toString());
+    }
 
     private JobListViewTypeDTO mapJobToDTO(Job job) {
         final Company company = job.getCompany();
