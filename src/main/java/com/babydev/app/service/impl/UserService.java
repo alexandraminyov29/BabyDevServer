@@ -66,20 +66,20 @@ public class UserService implements UserServiceFacade {
 		return phoneNumber;
 	}
 	
-	public Object getMyPersonalInformationByTab(String token, int tab) {
-		
+	public PersonalInformationDTO getMyPersonalInformation(String token) throws NotAuthorizedException {
 		User user = getUserFromToken(token);
-		switch (tab) {
-			// Get all user info (NO TAB)
-			case 0:
-			// TODO get all info from all tabs
-				break;
-				
-			// TAB 1 -> Personal Information
-			case 1:
-				return mapUserToPersonalInfo(user);
+		if (!Permissions.isStandard(user)) {
+			throw new NotAuthorizedException();
 		}
-		return null;
+		return mapUserToPersonalInfo(user);
+	}
+	
+	public PersonalInformationDTO getPersonalInformationById(String authorizationHeader, long id) throws NotAuthorizedException {
+		User user = getUserFromToken(authorizationHeader);
+		if (Permissions.isStandard(user)) {
+			throw new NotAuthorizedException();
+		}
+		return mapUserToPersonalInfo(this.findById(id).get());
 	}
 	
 	private PersonalInformationDTO mapUserToPersonalInfo(User user) {
@@ -251,4 +251,5 @@ public class UserService implements UserServiceFacade {
 	public Optional<User> findById(Long id) {
 		return userRepository.findById(id);
 	}
+
 }

@@ -135,20 +135,6 @@ public class QualificationsController {
 		}
 	}
 	
-//	@PutMapping("/skill")
-//	public ResponseEntity<?> updateSkill (
-//			@RequestHeader("Authorization") String authorizationHeader, 
-//			@RequestParam String email,
-//			@RequestBody SkillDTO skillDTO) {
-//		try {
-//			
-//			return ResponseEntity.status(HttpStatus.OK).body(qualificationsService.updateSkill(
-//					authorizationHeader, email, skillDTO));	
-//		} catch (NotAuthorizedException e) {
-//			return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED).body("METHOD NOT ALLOWED");
-//		}
-//	}
-	
 	@PutMapping("/experience")
 	public ResponseEntity<?> updateExperience (
 			@RequestHeader("Authorization") String authorizationHeader, 

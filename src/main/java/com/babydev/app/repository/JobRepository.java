@@ -24,7 +24,7 @@ public interface JobRepository extends JpaRepository<Job,Long> {
     @Query(value = "SELECT NEW com.babydev.app.domain.dto.JobPageDTO(job.jobId, job.title, job.description, " +
             "job.location, job.type, job.postDate, job.experienceRequired, " +
             "CASE WHEN (SELECT count(*) from job.applicants app WHERE app.id =:userId) > 0 THEN TRUE ELSE FALSE END, " +
-            "company.companyId, company.webPage, company.name, " +
+            "company.companyId, company.name, company.webPage, " +
             "company.image) " +
             "FROM Job job " +
             "LEFT JOIN job.company company " +

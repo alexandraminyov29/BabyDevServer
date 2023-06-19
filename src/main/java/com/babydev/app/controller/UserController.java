@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.babydev.app.domain.dto.PersonalInformationDTO;
 import com.babydev.app.domain.dto.RecruiterRequest;
 import com.babydev.app.domain.dto.RecruiterRequestListViewType;
 import com.babydev.app.domain.entity.Job;
@@ -75,13 +77,24 @@ public class UserController {
 	}
 	
 	@GetMapping(value = "/myprofile")
-	public ResponseEntity<?> getMyPersonalInformation(@RequestHeader("Authorization") String authorizationHeader,
-			@RequestParam int tab) {
-		Object result = userService.getMyPersonalInformationByTab(authorizationHeader, tab);
-		if (result != null) {
+	public ResponseEntity<PersonalInformationDTO> getMyPersonalInformation(
+			@RequestHeader("Authorization") String authorizationHeader) {
+		try {
+			PersonalInformationDTO result = userService.getMyPersonalInformation(authorizationHeader);
 			return ResponseEntity.status(HttpStatus.OK).body(result);
-		} else {
-			return new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE);
+		} catch (NotAuthorizedException e) {
+			return new ResponseEntity<>(HttpStatus.METHOD_NOT_ALLOWED);
+		}
+	}
+	
+	@GetMapping(value = "/profile/{id}")
+	public ResponseEntity<PersonalInformationDTO> getPersonalInformationById(@RequestHeader("Authorization") String authorizationHeader,
+			@PathVariable long id) {
+		try {
+			PersonalInformationDTO result = userService.getPersonalInformationById(authorizationHeader, id);
+			return ResponseEntity.status(HttpStatus.OK).body(result);
+		} catch (NotAuthorizedException e) {
+			return new ResponseEntity<>(HttpStatus.METHOD_NOT_ALLOWED);
 		}
 	}
 	
