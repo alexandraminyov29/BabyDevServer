@@ -19,4 +19,6 @@ public class ApplicantsDTO {
 
     private String location;
 
+    private byte[] image;
+
 }

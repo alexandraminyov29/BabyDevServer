@@ -5,6 +5,7 @@ import com.babydev.app.domain.dto.JobListViewTypeDTO;
 import com.babydev.app.domain.dto.JobPageDTO;
 import com.babydev.app.domain.entity.*;
 import com.babydev.app.exception.NotAuthorizedException;
+import com.babydev.app.helper.ImageUtil;
 import com.babydev.app.helper.Permissions;
 import com.babydev.app.repository.CompanyRepository;
 import com.babydev.app.repository.JobRepository;
@@ -393,6 +394,7 @@ public class JobService implements JobServiceFacade {
                             .lastName(applicant.getLastName())
                             .email(applicant.getEmail())
                             .location(applicant.getLocation().getName())
+                            .image(ImageUtil.decompressImage(applicant.getImageData()))
                     .build());
         }
         return result;
