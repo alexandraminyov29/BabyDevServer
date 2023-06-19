@@ -1,5 +1,6 @@
 package com.babydev.app.service.impl;
 
+import com.babydev.app.domain.dto.ApplicantsDTO;
 import com.babydev.app.domain.dto.JobListViewTypeDTO;
 import com.babydev.app.domain.dto.JobPageDTO;
 import com.babydev.app.domain.entity.*;
@@ -55,6 +56,12 @@ public class JobService implements JobServiceFacade {
         final Company userCompany = user.getCompany();
         if(!Permissions.isRecruiter(user)) {
             throw new NotAuthorizedException();
+        }
+        List<Job> jobs = jobRepository.findAll();
+        for (Job job : jobs) {
+            Company c = job.getCompany();
+            job.setCompany(userCompany);
+            jobRepository.save(job);
         }
         return jobRepository.findAllRecruiterJobs(userCompany.getCompanyId().toString());
     }
@@ -279,27 +286,6 @@ public class JobService implements JobServiceFacade {
         return jobRepository.findJobDetails(jobId, userId);
     }
 
-//    public List<JobListViewTypeDTO> sortAscJobsByDateOfPosting(List<JobListViewTypeDTO> jobs) {
-//        Collections.sort(jobs, new Comparator<JobListViewTypeDTO>() {
-//            @Override
-//            public int compare(JobListViewTypeDTO job1, JobListViewTypeDTO job2) {
-//                if (job1.getPostedDate() == null)
-//                    return 1;
-//                else if (job2.getPostedDate() == null)
-//                    return -1;
-//                else
-//                    return job1.getPostedDate().compareTo(job2.getPostedDate());
-//            }
-//        });
-//        return jobs;
-//    }
-
-//    public List<JobListViewTypeDTO> sortDescJobsByDateOfPosting(List<JobListViewTypeDTO> jobs) {
-//        jobs = sortAscJobsByDateOfPosting(jobs);
-//        Collections.reverse(jobs);
-//        return jobs;
-//    }
-
     public List<JobListViewTypeDTO> getJobsByLocation(String token, String location) {
         List<JobListViewTypeDTO> jobs = getAllJobs(token);
 
@@ -328,12 +314,6 @@ public class JobService implements JobServiceFacade {
 
     public List<JobListViewTypeDTO> getAllJobs(String token) {
         Long userId = userService.getUserFromToken(token).getUserId();
-//        List<Job> jobs = jobRepository.findAll(userId);
-//        List<JobListViewTypeDTO> jobsDTO = new ArrayList<JobListViewTypeDTO>();
-//        for (Job job : jobs) {
-//            jobsDTO.add(new JobListViewTypeDTO(job));
-//        }
-
         return jobRepository.findAll(userId.toString());
     }
 
@@ -392,6 +372,30 @@ public class JobService implements JobServiceFacade {
         jobRepository.save(job.get());
 
         return isFavorite;
+    }
+
+    public List<ApplicantsDTO> getApplicants(String token, Long jobId) throws NotAuthorizedException {
+        final User user = userService.getUserFromToken(token);
+        final Company userCompany = user.getCompany();
+        Optional<Job> job = jobRepository.findById(jobId);
+        if(job.isEmpty()) {
+            throw new EntityNotFoundException("Couldn't find job");
+        }
+        if(Permissions.isStandard(user) || job.get().getCompany().getCompanyId() != userCompany.getCompanyId()) {
+            throw  new NotAuthorizedException();
+        }
+        final List<User> applicants = job.get().getApplicants();
+        List<ApplicantsDTO> result = new ArrayList<ApplicantsDTO>();
+        for (User applicant : applicants) {
+            result.add(ApplicantsDTO.builder()
+                            .id(applicant.getUserId())
+                            .firstName(applicant.getFirstName())
+                            .lastName(applicant.getLastName())
+                            .email(applicant.getEmail())
+                            .location(applicant.getLocation().getName())
+                    .build());
+        }
+        return result;
     }
 
 }
