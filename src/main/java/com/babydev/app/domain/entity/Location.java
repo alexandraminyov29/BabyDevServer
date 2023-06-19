@@ -1,5 +1,6 @@
 package com.babydev.app.domain.entity;
 
+// GENERATED WITH CHAT GPT
 public enum Location {
     ALBA_IULIA("Alba Iulia"),
     IASI("Iasi"),

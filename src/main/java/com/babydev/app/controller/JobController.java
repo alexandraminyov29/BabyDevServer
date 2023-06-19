@@ -47,6 +47,18 @@ public class JobController {
         }
     }
 
+    @GetMapping("/getApplicants")
+    public ResponseEntity<?> getApplicants(@RequestHeader(value = "Authorization") String authorizationHeader,
+                                           @RequestParam Long jobId) {
+        try {
+            return ResponseEntity.status(HttpStatus.OK).body(jobService.getApplicants(authorizationHeader, jobId));
+        } catch (NotAuthorizedException e) {
+            return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED).body(e.getMessage());
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        }
+    }
+
     @GetMapping("/favorites")
     public ResponseEntity<List<JobListViewTypeDTO>> getFavoriteJobs(@RequestHeader(value = "Authorization") String authorizationHeader) {
         return ResponseEntity.status(HttpStatus.OK).body(jobService.getFavoriteJobs(authorizationHeader));
