@@ -47,9 +47,9 @@ public class JobService implements JobServiceFacade {
     }
 
     public JobPageDTO getJobPageById(String token, Long id) {
- 
-    	User user = userService.getUserFromToken(token);
-    	return jobRepository.findJobDetails(id, user.getUserId());
+
+        User user = userService.getUserFromToken(token);
+        return jobRepository.findJobDetails(id, user.getUserId());
     }
 
     public List<JobListViewTypeDTO> getAllRecruiterJobs(String token) throws NotAuthorizedException {
@@ -83,7 +83,7 @@ public class JobService implements JobServiceFacade {
     }
 
     private JobPageDTO mapJobPageToDTO(Job job) {
-    	return new JobPageDTO(job);
+        return new JobPageDTO(job);
     }
 
     private Job mapJobPageDTOToJob(JobPageDTO jobPageDTO, Company company) {
@@ -128,9 +128,12 @@ public class JobService implements JobServiceFacade {
         User user = userService.findById(userId).get();
         List<Job> favoriteJobs = user.getFavoriteJobs();
         List <JobListViewTypeDTO> jobResult = new ArrayList<>();
+        JobListViewTypeDTO jobItem;
         for (Job job : favoriteJobs) {
-            mapJobToDTO(job);
-            jobResult.add(mapJobToDTO(job));
+            jobItem = mapJobToDTO(job);
+            jobItem.setImage(ImageUtil.decompressImage(job.getCompany().getImage()));
+            jobItem.setFavorite(true);
+            jobResult.add(jobItem);
         }
         return jobResult;
     }
@@ -140,8 +143,11 @@ public class JobService implements JobServiceFacade {
         User user = userService.findById(userId).get();
         List<Job> appliedJobs = user.getAppliedJobs();
         List<JobListViewTypeDTO> jobResult = new ArrayList<>();
+        JobListViewTypeDTO jobItem;
         for(Job job : appliedJobs) {
-            jobResult.add(mapJobToDTO(job));
+            jobItem = mapJobToDTO(job);
+            jobItem.setImage(ImageUtil.decompressImage(job.getCompany().getImage()));
+            jobResult.add(jobItem);
         }
         return jobResult;
     }
@@ -259,6 +265,7 @@ public class JobService implements JobServiceFacade {
 
             newScore.thenAccept( score -> {
                 newJob.setScore(score);
+                newJob.setImage(ImageUtil.decompressImage(job.getCompany().getImage()));
                 jobsResult.add(newJob);
             }).join();
         }
@@ -389,12 +396,12 @@ public class JobService implements JobServiceFacade {
         List<ApplicantsDTO> result = new ArrayList<ApplicantsDTO>();
         for (User applicant : applicants) {
             result.add(ApplicantsDTO.builder()
-                            .id(applicant.getUserId())
-                            .firstName(applicant.getFirstName())
-                            .lastName(applicant.getLastName())
-                            .email(applicant.getEmail())
-                            .location(applicant.getLocation().getName())
-                            .image(ImageUtil.decompressImage(applicant.getImageData()))
+                    .id(applicant.getUserId())
+                    .firstName(applicant.getFirstName())
+                    .lastName(applicant.getLastName())
+                    .email(applicant.getEmail())
+//                            .location(applicant.getLocation().getName())
+                    .image(ImageUtil.decompressImage(applicant.getImageData()))
                     .build());
         }
         return result;
