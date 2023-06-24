@@ -75,7 +75,7 @@ public class UserTests {
 				.build());
 	}
 	@Test
-	public void testRecruiterRequestAddition() {
+	public void testInsertRecruiterRequest() {
 		int initialLength = 0;
 		List<RecruiterRequestListViewType> requests = null;
 		String dummyEmail = "john.cena29@yahoo.com";
