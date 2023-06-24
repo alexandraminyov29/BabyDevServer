@@ -47,9 +47,9 @@ public class JobService implements JobServiceFacade {
     }
 
     public JobPageDTO getJobPageById(String token, Long id) {
- 
-    	User user = userService.getUserFromToken(token);
-    	return jobRepository.findJobDetails(id, user.getUserId());
+
+        User user = userService.getUserFromToken(token);
+        return jobRepository.findJobDetails(id, user.getUserId());
     }
 
     public List<JobListViewTypeDTO> getAllRecruiterJobs(String token) throws NotAuthorizedException {
@@ -77,7 +77,7 @@ public class JobService implements JobServiceFacade {
     }
 
     private JobPageDTO mapJobPageToDTO(Job job) {
-    	return new JobPageDTO(job);
+        return new JobPageDTO(job);
     }
 
     private Job mapJobPageDTOToJob(JobPageDTO jobPageDTO, Company company) {
@@ -123,9 +123,9 @@ public class JobService implements JobServiceFacade {
         List <JobListViewTypeDTO> jobResult = new ArrayList<>();
         JobListViewTypeDTO jobItem;
         for (Job job : favoriteJobs) {
-        	jobItem = mapJobToDTO(job);
-        	jobItem.setImage(ImageUtil.decompressImage(job.getCompany().getImage()));
-        	jobItem.setFavorite(true);
+            jobItem = mapJobToDTO(job);
+            jobItem.setImage(ImageUtil.decompressImage(job.getCompany().getImage()));
+            jobItem.setFavorite(true);
             jobResult.add(jobItem);
         }
         return jobResult;
@@ -138,8 +138,8 @@ public class JobService implements JobServiceFacade {
         List<JobListViewTypeDTO> jobResult = new ArrayList<>();
         JobListViewTypeDTO jobItem;
         for(Job job : appliedJobs) {
-        	jobItem = mapJobToDTO(job);
-        	jobItem.setImage(ImageUtil.decompressImage(job.getCompany().getImage()));
+            jobItem = mapJobToDTO(job);
+            jobItem.setImage(ImageUtil.decompressImage(job.getCompany().getImage()));
             jobResult.add(jobItem);
         }
         return jobResult;
