@@ -58,12 +58,6 @@ public class JobService implements JobServiceFacade {
         if(!Permissions.isRecruiter(user)) {
             throw new NotAuthorizedException();
         }
-        List<Job> jobs = jobRepository.findAll();
-        for (Job job : jobs) {
-            Company c = job.getCompany();
-            job.setCompany(userCompany);
-            jobRepository.save(job);
-        }
         return jobRepository.findAllRecruiterJobs(userCompany.getCompanyId().toString());
     }
 
@@ -93,7 +87,6 @@ public class JobService implements JobServiceFacade {
                 .description(jobPageDTO.getDescription())
                 .location(jobPageDTO.getLocation())
                 .type(jobPageDTO.getType())
-                .promotedUntil(LocalDateTime.of(2023, 12, 31, 1, 2))
                 .postDate(LocalDate.now())
                 .experienceRequired(jobPageDTO.getExperienceRequired())
                 .company(company)
@@ -128,9 +121,12 @@ public class JobService implements JobServiceFacade {
         User user = userService.findById(userId).get();
         List<Job> favoriteJobs = user.getFavoriteJobs();
         List <JobListViewTypeDTO> jobResult = new ArrayList<>();
+        JobListViewTypeDTO jobItem;
         for (Job job : favoriteJobs) {
-            mapJobToDTO(job);
-            jobResult.add(mapJobToDTO(job));
+        	jobItem = mapJobToDTO(job);
+        	jobItem.setImage(ImageUtil.decompressImage(job.getCompany().getImage()));
+        	jobItem.setFavorite(true);
+            jobResult.add(jobItem);
         }
         return jobResult;
     }
@@ -140,8 +136,11 @@ public class JobService implements JobServiceFacade {
         User user = userService.findById(userId).get();
         List<Job> appliedJobs = user.getAppliedJobs();
         List<JobListViewTypeDTO> jobResult = new ArrayList<>();
+        JobListViewTypeDTO jobItem;
         for(Job job : appliedJobs) {
-            jobResult.add(mapJobToDTO(job));
+        	jobItem = mapJobToDTO(job);
+        	jobItem.setImage(ImageUtil.decompressImage(job.getCompany().getImage()));
+            jobResult.add(jobItem);
         }
         return jobResult;
     }
@@ -259,6 +258,7 @@ public class JobService implements JobServiceFacade {
 
             newScore.thenAccept( score -> {
                 newJob.setScore(score);
+                newJob.setImage(ImageUtil.decompressImage(job.getCompany().getImage()));
                 jobsResult.add(newJob);
             }).join();
         }
@@ -393,7 +393,7 @@ public class JobService implements JobServiceFacade {
                             .firstName(applicant.getFirstName())
                             .lastName(applicant.getLastName())
                             .email(applicant.getEmail())
-                            .location(applicant.getLocation().getName())
+//                            .location(applicant.getLocation().getName())
                             .image(ImageUtil.decompressImage(applicant.getImageData()))
                     .build());
         }

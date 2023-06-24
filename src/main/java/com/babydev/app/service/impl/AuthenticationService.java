@@ -58,7 +58,7 @@ public class AuthenticationService {
 	private final EmailService mailService;
 	
 	@Transactional
-	public CompletableFuture<Void> register(RegisterRequest request) throws EmptyFieldException, EmailIsTakenException, EmailNotValidException, PhoneNumberFormatException, PasswordConditionsException, RegistrationTokenNotValidException {
+	public void register(RegisterRequest request) throws EmptyFieldException, EmailIsTakenException, EmailNotValidException, PhoneNumberFormatException, PasswordConditionsException, RegistrationTokenNotValidException {
 	    checkRegisterRequest(request);
 	    User user = User.builder()
 	            .firstName(request.getFirstName())
@@ -87,8 +87,6 @@ public class AuthenticationService {
 	        final String verificationLink = "http://localhost:8080/api/auth/confirm?link=" + confirmationToken.getToken();
 	        mailService.sendVerificationLink(user.getEmail(), verificationLink);
 	    });
-
-	    return null;
 	}
 	
     @Transactional
@@ -115,7 +113,6 @@ public class AuthenticationService {
 
 	public AuthenticationResponse authenticate(AuthenticationRequest request)
 			throws EmailNotFoundException, WrongPasswordException, EmptyFieldException, RegistrationTokenNotValidException {
-		//TODO handle not active
 		if (request.getEmail().length() == 0 || request.getPassword().length() == 0) {
 			throw new EmptyFieldException();
 		}
@@ -159,7 +156,6 @@ public class AuthenticationService {
 		if (!request.getPhoneNumber().matches("[0-9]+")) {
 			throw new PhoneNumberFormatException();
 		}
-		
 		if (!isPasswordValid(request.getPassword())) {
 			throw new PasswordConditionsException();
 		}

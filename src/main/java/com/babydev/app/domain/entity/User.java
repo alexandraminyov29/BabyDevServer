@@ -66,18 +66,10 @@ public class User implements UserDetails{
     @JsonIgnore
 	@ManyToMany
 	private List<Job> appliedJobs;
-
-    @JsonIgnore
-	@OneToMany(mappedBy = "author", cascade = CascadeType.ALL)
-	private List<Job> postedJobs;
 	
     @JsonIgnore
 	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
 	private List<Skill> skills;
-	
-    @JsonIgnore
-	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-	private List<Notification> notifications;
 	
     @JsonIgnore
 	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL)

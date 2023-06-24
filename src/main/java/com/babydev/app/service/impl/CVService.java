@@ -167,17 +167,16 @@ public class CVService {
         List<String> relevantData = new ArrayList<String>();
         List<String> relevantDelimiters = new ArrayList<String>();
         
-        for (String word : cvWords) {
-            if (!Cstl.europassTemplate.contains(word)) {
-                relevantData.add(word);
-                if (!relevantDelimiters.contains(word) && (word.equals("EXPERIENCE") 
-                		|| word.equals("TRAINING") || word.equals("Communication")
-                		|| word.equals("Organisational") || word.equals("Job-related"))) {
-                	relevantDelimiters.add(word);
-            } 
-            
-            }
-        }
+		for (String word : cvWords) {
+			if (!Cstl.europassTemplate.contains(word)) {
+				relevantData.add(word);
+				if (!relevantDelimiters.contains(word)
+						&& (word.equals("EXPERIENCE") || word.equals("TRAINING") || word.equals("Communication")
+								|| word.equals("Organisational") || word.equals("Job-related"))) {
+					relevantDelimiters.add(word);
+				}
+			}
+		}
         
         List<List<String>> sections = new ArrayList<List<String>>();
         int beginDelimiter = 0;

@@ -131,7 +131,9 @@ public class UserService implements UserServiceFacade {
 			company = companyService.getCompanyByName(companyInfo.getName());
 			companyImage = ImageUtil.decompressImage(company.getImage());
 		} else {
-			companyImage = ImageUtil.compressImage(Base64.getDecoder().decode(companyInfo.getImage()));
+			companyImage = ImageUtil.compressImage(Base64.getDecoder()
+					.decode(companyInfo.getImage() != null ? companyInfo.getImage()
+							: ""));
 			company = Company.builder()
 					.name(companyInfo.getName())
 					.image(companyImage)
