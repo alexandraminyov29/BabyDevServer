@@ -34,9 +34,6 @@ public class Job {
     @Column(name = "type")
     private JobType type;
 
-    @Column(name = "promoted_until")
-    private LocalDateTime promotedUntil;
-
     @Column(name = "post_date")
     private LocalDate postDate;
 
@@ -52,11 +49,6 @@ public class Job {
     @ManyToMany
     @JoinTable(name = "favorites", joinColumns = @JoinColumn(name = "job_id"), inverseJoinColumns = @JoinColumn(name = "user_id"))
     private List<User> usersFavorites;
-
-    @JsonIgnore
-    @ManyToOne
-    @JoinColumn(referencedColumnName = "id", name = "author_id")
-    private User author;
 
     @JsonIgnore
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "job")
