@@ -20,7 +20,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -88,7 +87,6 @@ public class JobService implements JobServiceFacade {
                 .description(jobPageDTO.getDescription())
                 .location(jobPageDTO.getLocation())
                 .type(jobPageDTO.getType())
-                .promotedUntil(LocalDateTime.of(2023, 12, 31, 1, 2))
                 .postDate(LocalDate.now())
                 .experienceRequired(jobPageDTO.getExperienceRequired())
                 .company(company)
