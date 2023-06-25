@@ -94,7 +94,9 @@ public class JobController {
     }
 
     @PostMapping("/add")
-    public ResponseEntity<?> addJob(@RequestHeader(value = "Authorization") String authorizationHeader, @RequestBody JobPageDTO jobPageDTO) {
+    public ResponseEntity<?> addJob(
+            @RequestHeader(value = "Authorization") String authorizationHeader,
+            @RequestBody JobPageDTO jobPageDTO) {
         try {
             jobService.addJob(authorizationHeader, jobPageDTO);
             return ResponseEntity.status(HttpStatus.OK).body("Job added!");

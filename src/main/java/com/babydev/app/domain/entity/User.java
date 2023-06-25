@@ -56,7 +56,7 @@ public class User implements UserDetails{
 	private Location location;
 
 	@JsonIgnore
-	@ManyToMany
+	@ManyToMany(fetch = FetchType.EAGER)
 	private List<Job> favoriteJobs;
     
     @Lob

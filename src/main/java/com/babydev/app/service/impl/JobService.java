@@ -58,12 +58,7 @@ public class JobService implements JobServiceFacade {
         if(!Permissions.isRecruiter(user)) {
             throw new NotAuthorizedException();
         }
-        List<Job> jobs = jobRepository.findAll();
-        for (Job job : jobs) {
-            Company c = job.getCompany();
-            job.setCompany(userCompany);
-            jobRepository.save(job);
-        }
+
         return jobRepository.findAllRecruiterJobs(userCompany.getCompanyId().toString());
     }
 
@@ -200,8 +195,6 @@ public class JobService implements JobServiceFacade {
         try {
 
             List<String> jobLocation = findLocationInJobDescription(job.getDescription());
-
-
             String userLocation = user.getLocation().toString();
             userLocation = userLocation.trim().toLowerCase();
 
@@ -326,7 +319,7 @@ public class JobService implements JobServiceFacade {
     }
 
 
-    public void applyJob(String token, Long jobId) throws RuntimeException{
+    public void applyJob(String token, Long jobId) throws RuntimeException {
         Optional<Job> job = jobRepository.findById(jobId);
         if(job.isEmpty()) {
             throw new EntityNotFoundException("Couldn't find job");
@@ -336,22 +329,17 @@ public class JobService implements JobServiceFacade {
         if(user.isEmpty()) {
             throw new EntityNotFoundException("Couldn't find user");
         }
-
         List<User> applicants = job.get().getApplicants();
-
         // Check if user already applied to the given job
         for (User applicant : applicants) {
             if (applicant.getUserId() == userId) {
                 throw new RuntimeException("You've already applied!");
             }
-
         }
-
         job.get().getApplicants().add(user.get());
         user.get().getAppliedJobs().add(job.get());
         userService.save(user.get());
         jobRepository.save(job.get());
-
     }
 
     @Transactional

@@ -2,13 +2,13 @@ import sys
 from flair.data import Sentence
 from flair.models import SequenceTagger
 
-# Load tagger
+# Load the pre-trained model in English
 tagger = SequenceTagger.load("flair/ner-english")
 
-# Make sentence
+# Make sentence from the first argument from the command line
 sentence = Sentence(sys.argv[1])
 
-# Predict NER tags
+# Predict NER tags using the model
 tagger.predict(sentence)
 
 # Get predicted entities with labels 'MISC' and 'ORG'

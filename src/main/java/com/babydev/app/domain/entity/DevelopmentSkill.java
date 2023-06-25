@@ -33,7 +33,7 @@ public enum DevelopmentSkill {
     PYTORCH("PyTorch"),
     MACHINE_LEARNING("Machine Learning"),
     DEEP_LEARNING("Deep Learning"),
-    NATURAL_LANGUAGE_PROCESSING("Natural Language Processing (NLP)"),
+    NATURAL_LANGUAGE_PROCESSING("NLP"),
     COMPUTER_VISION("Computer Vision"),
     DATA_SCIENCE("Data Science"),
     DATA_ANALYSIS("Data Analysis"),

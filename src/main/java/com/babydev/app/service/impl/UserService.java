@@ -68,7 +68,7 @@ public class UserService implements UserServiceFacade {
 	
 	public PersonalInformationDTO getMyPersonalInformation(String token) throws NotAuthorizedException {
 		User user = getUserFromToken(token);
-		if (!Permissions.isStandard(user)) {
+		if (Permissions.isAdmin(user)) {
 			throw new NotAuthorizedException();
 		}
 		return mapUserToPersonalInfo(user);

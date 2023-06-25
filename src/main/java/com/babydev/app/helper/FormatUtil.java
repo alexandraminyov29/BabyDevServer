@@ -23,12 +23,6 @@ public class FormatUtil {
         if (daysDiff < 1) {
             return "Today";
         } else if (daysDiff < 7) {
-            long hoursDiff = ChronoUnit.HOURS.between(date.atStartOfDay(), currentDate.atStartOfDay());
-            if (hoursDiff == 1) {
-            	return "One hour ago";
-            }
-            return hoursDiff + " hours ago";
-        } else if (daysDiff <= 7) {
         	if (daysDiff == 1) {
         		return "Yesterday";
         	}
@@ -37,7 +31,7 @@ public class FormatUtil {
             return date.format(DateTimeFormatter.ofPattern("dd-MM-yyyy"));
         }
     }
-	
+
 	public static DevelopmentSkill getSkillFromEnumValue(String value) {
 	    for (DevelopmentSkill skill : DevelopmentSkill.values()) {
 	        if (skill.getDisplayName().equalsIgnoreCase(value)) {
